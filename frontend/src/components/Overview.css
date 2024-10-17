@@ -1,0 +1,51 @@
+/* Overview.css */
+
+.overview-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: stretch;
+    margin: 50px 0;
+    flex-wrap: wrap; /* Allows cards to stack on smaller screens */
+  }
+  
+  .card {
+    width: 45%; /* Adjust width to fit side by side */
+    background: linear-gradient(135deg, #ff7e5f, #feb47b); /* Gradient background */
+    color: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.5s ease, box-shadow 0.5s ease; /* Add transition for hover effect */
+    opacity: 0; /* Start with invisible for fade-in effect */
+    transform: translateY(30px); /* Start off-screen for slide effect */
+    margin: 20px; /* Add some spacing between cards */
+  }
+  
+  .card.fade-in {
+    opacity: 1; /* Fade in to fully visible */
+    transform: translateY(0); /* Slide to original position */
+  }
+  
+  .card h3 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+  }
+  
+  .card p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  
+  /* Add hover effect for cards */
+  .card:hover {
+    transform: scale(1.05); /* Slightly enlarge on hover */
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Media queries for responsiveness */
+  @media (max-width: 768px) {
+    .card {
+      width: 100%; /* Stack cards vertically on smaller screens */
+    }
+  }
+  
