@@ -1,258 +1,28 @@
-/* Container for the landing page */
+/* LandingPage.css */
+
 .landing-page {
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat; 
-    background-attachment: scroll;
-    min-height: 100vh;
-    color: white;
-    display: flex;
+  
     flex-direction: column;
-    align-items: flex-start; /* Align content to the left */
-    overflow: auto; 
-    text-align: left;
-    padding-left: 20px; /* Add some padding from the left edge */
-}
-
-/* Logo and heading container to display them side by side */
-.header-container {
-    display: flex;
-    align-items: center; /* Vertically aligns items */
-    justify-content: flex-start; /* Align items to the left */
-    margin-top: 20px;
-}
-
-/* LPU Logo */
-.lpu-logo img {
-    width: 150px; /* Adjust the size of the logo as needed */
-    margin-right: 20px; /* Space between logo and text */
-}
-
-/* Styling for the centered heading and subtitle */
-.heading-subtitle {
-    text-align: left;
-}
-
-.main-heading {
-    font-size: 48px;
-    font-weight: bold;
-    margin: 0;
-}
-
-.sub-heading {
-    font-size: 24px;
-    font-weight: normal;
-    margin-top: 10px;
-    color: #f0f0f0;
-}
-
-/* Authentication buttons (Login and Signup) */
-.auth-buttons {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-}
-
-/* Styling for the Login button */
-.login-btn {
-    background-color: #ADD8E6;
-    border: none;
-    padding: 10px 20px;
-    margin-right: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-}
-
-/* Styling for the Signup button */
-.signup-btn {
-    background-color: #003366;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-}
-
-/* Hover effect for Signup button */
-.signup-btn:hover {
-    opacity: 0.9;
-}
-
-/* Section for interactive overview content */
-.interactive-overview {
-    margin: 40px 0; 
-    text-align: center;
-}
-
-/* Video container for the overview section */
-.overview-video {
-    margin-top: 20px;
-    max-width: 100%; /* Ensures the video fits within the container */
-    height: auto;
-}
-
-.overview-container {
-    display: flex;
-    flex-direction: column; /* Stack the cards vertically */
-    align-items: center; /* Center the cards */
-    margin: 40px 0; /* Space around the cards */
-}
-
-/* Styling for the cards */
-.card {
-    background-image: url('../assets/card-background.jpeg'); /* Path to your card background image */
-    background-size: cover; /* Ensures the image covers the entire card */
-    background-position: center; /* Centers the image */
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    width: 500px; /* Set a fixed width for the cards */
-    height: 400px; /* Set a fixed height for the cards */
-    margin: 10px 0; /* Space between cards */
-    opacity: 0; /* Start as invisible for fade-in effect */
-    transform: translateY(20px); /* Start slightly lower for slide effect */
-    color: black; /* Text color for better contrast against the background */
-    display: flex; /* Flexbox for aligning text */
-    flex-direction: column; /* Stack title and content vertically */
-    justify-content: center; /* Center the content vertically */
-    text-align: center; /* Center the text */
-    
-}
-/* New Features Card */
-/* Features Section */
-.features-section {
-    margin: 40px 0; /* Space around the section */
-    text-align: center; /* Center text */
-}
-
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Fixed 3-column layout */
-    gap: 20px; /* Space between cards */
-}
-
-/* Individual Feature Card */
-.feature-card {
-    background-image: url('../assets/card-background.jpeg'); /* Path to your feature card background image */
-    background-size: cover;
-    background-position: center;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    color: black; /* Text color */
-    transition: transform 0.3s, box-shadow 0.3s; /* Transition for hover effect */
-}
-
-/* Hover effect for feature cards */
-.feature-card:hover {
-    transform: translateY(-5px); /* Lift effect */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4); /* Enhanced shadow on hover */
-}
-
-/* Feature card image styling */
-.feature-card img {
-    width: 60px; /* Size of the icon */
-    margin-bottom: 10px; /* Space below the icon */
-    border-radius: 50%; /* Circular border for the icon */
-}
-
-.middle-image-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px; /* Adjust for spacing from the elements above */
-  }
-  
-  .middle-image {
-    width: 70%; /* Adjust this value to control the size */
-    height: auto;
-    max-width: 1000px; /* You can set a max width */
-  }
-  .banner-section {
-    background-image: url('../assets/banner-image.jpg'); /* Use the correct path */
-    background-size: cover;
-    background-position: center;
-    height: 70vh; /* Adjust the height based on the design */
-    display: flex;
     align-items: center;
-    justify-content: center;
-    position: relative;
+    margin: 0; /* Reset margin */
+    padding: 0; /* Reset padding */
   }
   
-  .banner-content {
+  .interactive-overview {
     text-align: center;
-    color: white; /* Change the text color if necessary */
-    z-index: 2;
+    margin: 20px 0; /* Space around overview section */
+    padding: 20px; /* Padding for overview section */
   }
   
-  .banner-content h1 {
-    font-size: 3rem; /* Adjust the size as needed */
-    margin: 0;
+  .overview-video {
+    margin-top: 20px; /* Space above video */
+    max-width: 100%; /* Ensure responsiveness */
   }
   
-  .banner-content p {
-    font-size: 1.5rem;
-    margin-top: 10px;
+  .overview-video iframe {
+    height: 315px; /* Set a fixed height */
+    border: none; /* Remove default border */
   }
   
-  .cta-button {
-    background-color: #ff9800; /* Adjust the button color */
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 1.2rem;
-    margin-top: 20px;
-    cursor: pointer;
-  }
-  
-  .banner-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Dark overlay for better text visibility */
-    z-index: 1;
-  }
-    
-
-/* Fade-in animation */
-.fade-in {
-    opacity: 1; /* Fully visible */
-    transform: translateY(0); /* Move to original position */
-    transition: opacity 3s ease, transform 0.5s ease; /* Transition effects */
-}
-
-
-
-/* Adjustments for responsiveness */
-@media (min-width: 768px) {
-    .overview-container {
-        flex-direction: row; /* Align cards horizontally on larger screens */
-        justify-content: center; /* Center the cards */
-    }
-
-    .card {
-        margin: 0 20px; /* Space between cards horizontally */
-    }
-}
-
-@media (max-width: 768px) {
-    .banner-content h1 {
-      font-size: 2rem;
-    }
-  
-    .banner-content p {
-      font-size: 1rem;
-    }
-  
-    .cta-button {
-      font-size: 1rem;
-      padding: 8px 16px;
-    }
-  }
+  /* Add additional styles for Header, Banner, Overview, Features, and Footer as needed */
   

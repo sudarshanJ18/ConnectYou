@@ -1,0 +1,39 @@
+.features-section {
+    margin: 40px 20px;
+  }
+  
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Create a 3-column layout */
+    gap: 20px; /* Space between cards */
+  }
+  
+  .feature-card {
+    background-color: #f7f7f7; /* Light background color */
+    border-radius: 8px; /* Rounded corners */
+    padding: 20px; /* Add padding */
+    text-align: center; /* Center the text */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add transition effects */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+  }
+  
+  .feature-card:hover {
+    transform: translateY(-5px); /* Lift the card on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
+  }
+  
+  .feature-card img {
+    width: 80px; /* Adjust icon size */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 10px; /* Space between image and text */
+    border-radius: 50px;
+  }
+  
+  .feature-card h4 {
+    color: #333; /* Darker text color for headings */
+  }
+  
+  .feature-card p {
+    color: #666; /* Lighter text color for descriptions */
+  }
+  
