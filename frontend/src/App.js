@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Header from './components/Header';
-import Login from './pages/login';
+import Login from './pages/login';  // Make sure your import paths are correct
 import Signup from './pages/Signup';
 import Footer from './components/Footer';
 import LandingPage from './components/LandingPage';
+import Dashboard from './components/Dashboard'; // Your new Dashboard component
 import '@fortawesome/fontawesome-free/css/all.min.css';
-
 
 const App = () => {
   const location = useLocation(); // Get the current location
@@ -16,13 +16,15 @@ const App = () => {
   return (
     <div>
       <Header />
+      
       {/* Conditionally render Routes */}
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/dashboard" element={<Dashboard />} /> {/* Add Dashboard route */}
       </Routes>
-
+     
       {/* Conditionally render the Footer */}
       {shouldShowFooter && <Footer />}
     </div>

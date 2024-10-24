@@ -1,109 +1,111 @@
 .banner-section {
-    position: relative;
-    height: 100vh; /* Adjust as needed */
-    width: 100%;
-    background-size: cover;
-    background-position: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white; /* Adjust text color for contrast */
-    
-  }
-  
-  .banner-content {
-    text-align: left; /* Center text */
-    font-size: 80px;
-    font-family: Verdana, Geneva, Tahoma, sans-serif,bold;
-    opacity: 0; /* Start hidden for slide-in effect */
-    transform: translateY(-20px); /* Start slightly above */
-    transition: opacity 0.5s ease, transform 0.5s ease; /* Transition for slide-in effect */
-    z-index: 1; /* Ensure content is above other elements */
-  }
-  
-  .banner-content.slide-in {
-    opacity: 1; /* Fade in */
-    transform: translateY(0); /* Slide into place */
-  }
-  
-  .explore-btn {
-    margin-top: 20px; /* Space between text and button */
-    padding: 10px 20px; /* Button padding */
-    border: none; /* Remove default border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer on hover */
-    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
-    color: white; /* Button text color */
-    font-size: 1em; /* Button font size */
-    transition: background-color 0.3s; /* Transition for hover effect */
-  }
-  
-  .explore-btn:hover {
-    background-color: rgba(255, 255, 255, 0.8); /* Change background on hover */
-    color: darkblue; /* Change text color on hover */
-  }
-  
-  .highlight {
-    color: lightblue; /* Customize color */
-  }
-  
-  .highlight-2 {
-    color: red; /* Customize color */
-  }
-  
-  /* Decorative Shape Styles */
-  .decorative-shape {
-    position: relative; /* Positioning it absolutely in the banner */
-    right: 0; /* Align to the right */
-    top: 100%; /* Center vertically */
-    transform: translateY(-50%); /* Adjust for vertical centering */
-    width: 250px; /* Adjust width as needed */
-    height: 250px; /* Adjust height as needed */
-    background-color: rgba(255, 255, 255, 0.5); /* Shape background (white with some transparency) */
-    border-radius: 50%; /* Circular shape */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Add shadow for depth */
-    animation: bounce 2s infinite; /* Bounce animation */
-  }
-  .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
-  }
-  .connect-you-image {
-    position: absolute; /* Position the image absolutely */
-    bottom: 20px; /* Adjust based on desired position */
-    right: 20px; /* Adjust based on desired position */
-    width: 150px; /* Adjust size as needed */
-    border-radius: 10px; /* Optional: Rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Shadow effect */
-    animation: slide-up 0.8s ease-out; /* Animation for entrance */
-  }
-  
-  @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {
+  position: relative;
+  height: 100vh; /* Adjust as needed */
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white; /* Adjust text color for contrast */
+}
+
+.banner-content {
+  text-align: left; /* Center text */
+  font-size: 80px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  opacity: 0; /* Start hidden for slide-in effect */
+  transform: translateY(-20px); /* Start slightly above */
+  transition: opacity 0.5s ease, transform 0.5s ease; /* Transition for slide-in effect */
+  z-index: 1; /* Ensure content is above other elements */
+}
+
+.banner-content.slide-in {
+  opacity: 1; /* Fade in */
+  transform: translateY(0); /* Slide into place */
+}
+
+.explore-btn {
+  margin-top: 20px; /* Space between text and button */
+  padding: 10px 20px; /* Button padding */
+  border: none; /* Remove default border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer on hover */
+  background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+  color: white; /* Button text color */
+  font-size: 1em; /* Button font size */
+  transition: background-color 0.3s, transform 0.3s; /* Transition for hover effect */
+}
+
+.explore-btn:hover {
+  background-color: rgba(255, 255, 255, 0.8); /* Change background on hover */
+  color: darkblue; /* Change text color on hover */
+  transform: scale(1.05); /* Slightly enlarge button on hover */
+}
+
+.highlight {
+  color: lightblue; /* Customize color */
+}
+
+.highlight-2 {
+  color: red; /* Customize color */
+}
+
+/* Decorative Shape Styles */
+.decorative-shape {
+  position: relative; /* Positioning it absolutely in the banner */
+  right: 0; /* Align to the right */
+  top: 100%; /* Center vertically */
+  transform: translateY(-50%); /* Adjust for vertical centering */
+  width: 250px; /* Adjust width as needed */
+  height: 250px; /* Adjust height as needed */
+  background-color: rgba(255, 255, 255, 0.5); /* Shape background (white with some transparency) */
+  border-radius: 50%; /* Circular shape */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Add shadow for depth */
+  animation: bounce 2s infinite; /* Bounce animation */
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+}
+
+.connect-you-image {
+  position: absolute; /* Position the image absolutely */
+  bottom: 20px; /* Adjust based on desired position */
+  right: 20px; /* Adjust based on desired position */
+  width: 150px; /* Adjust size as needed */
+  border-radius: 10px; /* Optional: Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Shadow effect */
+  animation: slide-up 0.8s ease-out; /* Animation for entrance */
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
       transform: translateY(-50%); /* Stay in center */
-    }
-    40% {
-      transform: translateY(-60%); /* Bounce up */
-    }
-    60% {
-      transform: translateY(-40%); /* Bounce back down */
-    }
   }
-  
-  @keyframes slide-up {
-    from {
+  40% {
+      transform: translateY(-60%); /* Bounce up */
+  }
+  60% {
+      transform: translateY(-40%); /* Bounce back down */
+  }
+}
+
+@keyframes slide-up {
+  from {
       transform: translateY(20px);
       opacity: 0;
-    }
-    to {
+  }
+  to {
       transform: translateY(0);
       opacity: 1;
-    }
   }
+}

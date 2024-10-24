@@ -1,0 +1,74 @@
+.alumni-showcase {
+  scroll-behavior: smooth;
+}
+
+.alumni-card {
+  transition: transform 0.3s ease-in-out;
+}
+
+.alumni-card:hover {
+  transform: scale(1.05);
+}
+
+.alumni-image {
+  border-radius: 10px;
+}
+
+/* Simplified heading style */
+.creative-heading {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #1d4ed8; /* Use a single solid color for the heading text */
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #3b82f6; /* Add a simple underline for emphasis */
+  display: inline-block;
+  padding-bottom: 0.2rem; /* Space between text and underline */
+}
+
+h2 {
+  animation: fadeIn 1s ease; /* Keep the fade-in effect for a subtle entrance */
+}
+
+/* Keyframes for fade-in effect */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+
+
+@keyframes floating {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes rotate-border {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+h2 {
+  animation: fadeIn 1s ease;
+}
+
+/* Keyframes for fade-in effect */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
