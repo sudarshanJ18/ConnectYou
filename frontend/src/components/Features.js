@@ -10,37 +10,51 @@ import './Features.css';
 const Features = ({ showCards }) => {
   return (
     <div className={`features-section ${showCards ? 'fade-in' : ''}`}>
-      <h3>What You Can Do in ConnectYou</h3>
-      <div className="features-grid">
-        <div className="feature-card">
-          <img src={mentorIcon} alt="Mentorship" />
-          <h4>Mentorship</h4>
-          <p>Connect with alumni for guidance and support.</p>
+      <h5 className="offer">
+        What ConnectYou Offers
+      </h5>
+      <div className="flex flex-col sm:flex-row sm:space-x-4">
+        <div className="w-full sm:w-1/2 bg-gray-100 rounded-lg p-6 shadow-lg">
+          <h6 className="text-2xl font-semibold text-center mb-4">Explore Features</h6>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {[
+              { icon: mentorIcon, title: 'Mentorship', description: 'Connect with alumni for guidance and support.', glowColor: 'rgba(255, 193, 7, 0.5)' },
+              { icon: groupIcon, title: 'Join Groups', description: 'Engage in interest-based groups for collaboration.', glowColor: 'rgba(40, 167, 69, 0.5)' },
+              { icon: jobsIcon, title: 'Job Listings', description: 'Explore job opportunities and internships.', glowColor: 'rgba(23, 162, 184, 0.5)' },
+            ].map((feature, index) => (
+              <div
+                key={index}
+                className="feature-card transition duration-300 relative border rounded-lg shadow-md overflow-hidden p-4 hover:shadow-lg"
+                style={{ '--glow-color': feature.glowColor }}
+              >
+                <div className="glow-card"></div>
+                <img src={feature.icon} alt={feature.title} className="w-16 h-16 mb-4 mx-auto" />
+                <h4 className="text-xl font-semibold text-center mb-2">{feature.title}</h4>
+                <p className="text-gray-700 text-center">{feature.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="feature-card">
-          <img src={groupIcon} alt="Groups" />
-          <h4>Join Groups</h4>
-          <p>Engage in interest-based groups for collaboration.</p>
-        </div>
-        <div className="feature-card">
-          <img src={jobsIcon} alt="Job Listings" />
-          <h4>Job Listings</h4>
-          <p>Explore job opportunities and internships.</p>
-        </div>
-        <div className="feature-card">
-          <img src={workshopIcon} alt="Workshops" />
-          <h4>Workshops</h4>
-          <p>Participate in skill development workshops.</p>
-        </div>
-        <div className="feature-card">
-          <img src={projectsIcon} alt="Projects" />
-          <h4>Collaborate</h4>
-          <p>Work together on group projects and initiatives.</p>
-        </div>
-        <div className="feature-card">
-          <img src={resourcesIcon} alt="Resources" />
-          <h4>Resources</h4>
-          <p>Access valuable resources for career growth.</p>
+        <div className="w-full sm:w-1/2 bg-gray-200 rounded-lg p-6 shadow-lg">
+          <h6 className="text-2xl font-semibold text-center mb-4">More Features</h6>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {[
+              { icon: workshopIcon, title: 'Workshops', description: 'Participate in skill development workshops.', glowColor: 'rgba(255, 0, 0, 0.5)' },
+              { icon: projectsIcon, title: 'Collaborate', description: 'Work together on group projects and initiatives.', glowColor: 'rgba(255, 87, 34, 0.5)' },
+              { icon: resourcesIcon, title: 'Resources', description: 'Access valuable resources for career growth.', glowColor: 'rgba(0, 123, 255, 0.5)' },
+            ].map((feature, index) => (
+              <div
+                key={index}
+                className="feature-card transition duration-300 relative border rounded-lg shadow-md overflow-hidden p-4 hover:shadow-lg"
+                style={{ '--glow-color': feature.glowColor }}
+              >
+                <div className="glow-card"></div>
+                <img src={feature.icon} alt={feature.title} className="w-16 h-16 mb-4 mx-auto" />
+                <h4 className="text-xl font-semibold text-center mb-2">{feature.title}</h4>
+                <p className="text-gray-700 text-center">{feature.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

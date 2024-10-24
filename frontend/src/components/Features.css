@@ -1,39 +1,75 @@
 .features-section {
-    margin: 40px 20px;
+  padding: 50px;
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+h5 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #1d4ed8; /* Use a single solid color for the heading text */
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #3b82f6; /* Add a simple underline for emphasis */
+  display: inline-block;
+  padding-bottom: 0.2rem; /* Space between text and underline */
+}
+
+/* Adjust fadeIn animation for smoother appearance */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-  
-  .features-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Create a 3-column layout */
-    gap: 20px; /* Space between cards */
+  to {
+    opacity: 1;
   }
-  
-  .feature-card {
-    background-color: #f7f7f7; /* Light background color */
-    border-radius: 8px; /* Rounded corners */
-    padding: 20px; /* Add padding */
-    text-align: center; /* Center the text */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add transition effects */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
-  }
-  
-  .feature-card:hover {
-    transform: translateY(-5px); /* Lift the card on hover */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
-  }
-  
-  .feature-card img {
-    width: 80px; /* Adjust icon size */
-    height: auto; /* Maintain aspect ratio */
-    margin-bottom: 10px; /* Space between image and text */
-    border-radius: 50px;
-  }
-  
-  .feature-card h4 {
-    color: #333; /* Darker text color for headings */
-  }
-  
-  .feature-card p {
-    color: #666; /* Lighter text color for descriptions */
-  }
-  
+}
+
+/* Feature cards layout */
+.feature-card {
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.glow-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 15px;
+  background: var(--glow-color);
+  filter: blur(30px);
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.feature-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.feature-card:hover .glow-card::before {
+  opacity: 1;
+}
+
+.feature-card img {
+  width: 70px; /* Adjusted image size for better proportions */
+  height: auto;
+  margin-bottom: 15px;
+}
+
+.feature-card h4 {
+  margin-bottom: 10px;
+}
+
+.feature-card p {
+  font-size: 0.9rem;
+  color: #555;
+}
