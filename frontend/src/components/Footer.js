@@ -14,7 +14,7 @@ const Footer = () => {
         {/* Contact Information */}
         <div className="footer-section contact">
           <h3>Contact Us</h3>
-          <p>Email: support@connectyou.com</p>
+          <p>Email: <a href="mailto:support@connectyou.com">support@connectyou.com</a></p>
           <p>Phone: +91 12345 67890</p>
           <p>Address: 123, Tech Park, Bengaluru, India</p>
         </div>

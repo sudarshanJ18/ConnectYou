@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate instead of useHistory
-import './Header.css'; // Ensure you have the CSS for header styling
 import lpuLogo from '../assets/lpu-logo.png';
 
 const Header = () => {
@@ -15,17 +14,27 @@ const Header = () => {
   };
 
   return (
-    <header className="header-container">
-      <div className="logo-container">
-        <img src={lpuLogo} alt="LPU Logo" className="logo" />
-        <div className="title-container">
-          <h1 className="main-heading">ConnectYou</h1>
-          <p className="sub-heading">Alumni & Student Engagement Hub</p>
+    <header className="flex justify-between items-center w-full p-4 bg-black">
+      <div className="flex items-center">
+        <img src={lpuLogo} alt="LPU Logo" className="w-24 h-auto mr-2" />
+        <div className="flex flex-col">
+          <h1 className="text-2xl text-white">ConnectYou</h1>
+          <p className="text-gray-400">Alumni & Student Engagement Hub</p>
         </div>
       </div>
-      <div className="auth-buttons">
-        <button className="login-btn" onClick={handleLogin}>Login</button>
-        <button className="signup-btn" onClick={handleSignup}>Signup</button>
+      <div className="flex space-x-4">
+        <button 
+          onClick={handleLogin} 
+          className="bg-blue-400 hover:bg-blue-500 text-black py-2 px-4 rounded"
+        >
+          Login
+        </button>
+        <button 
+          onClick={handleSignup} 
+          className="bg-blue-800 hover:bg-blue-900 text-white py-2 px-4 rounded"
+        >
+          Signup
+        </button>
       </div>
     </header>
   );

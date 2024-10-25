@@ -1,16 +1,23 @@
+/* General Footer Styling */
 .footer {
-  background-color: #000;
-  color: #fff;
+  background-color: #1f2937;
+  color: #f1f5f9;
   padding: 40px 20px;
+  width: 100vw; /* Full width of the viewport */
+  margin-left: 20px; /* Adjust any margin issues */
 }
 
 .footer-content {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   flex-wrap: wrap;
-  max-width: 1200px;
+  max-width: fit-content;
   margin: 0 auto;
+  gap: 20px;
 }
+
+
 
 .footer-section {
   flex-basis: 30%;
@@ -84,4 +91,16 @@
 
 .footer-bottom p {
   margin: 0;
+}
+
+/* Responsive Footer Adjustments */
+@media (max-width: 768px) {
+  .footer-section {
+    flex-basis: 100%; /* Make sections full-width on small screens */
+    text-align: center; /* Center-align content for smaller screens */
+  }
+
+  .social-links {
+    justify-content: center;
+  }
 }
