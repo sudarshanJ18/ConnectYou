@@ -1,7 +1,11 @@
+/* Alumni Showcase Styling */
 .alumni-showcase {
   scroll-behavior: smooth;
+  max-width: fit-content;
+  padding: 20px;
 }
 
+/* Alumni Card Hover Effect */
 .alumni-card {
   transition: transform 0.3s ease-in-out;
 }
@@ -10,26 +14,30 @@
   transform: scale(1.05);
 }
 
+/* Alumni Image Styling */
 .alumni-image {
   border-radius: 10px;
+  width: 100%;
+  height: auto;
 }
 
-/* Simplified heading style */
+/* Heading Styling */
 .creative-heading {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #1d4ed8; /* Use a single solid color for the heading text */
+  color: #1d4ed8; /* Solid blue color */
   margin-bottom: 1rem;
-  border-bottom: 2px solid #3b82f6; /* Add a simple underline for emphasis */
+  border-bottom: 2px solid #3b82f6; /* Simple underline for emphasis */
   display: inline-block;
-  padding-bottom: 0.2rem; /* Space between text and underline */
+  padding-bottom: 0.2rem; /* Adds space between text and underline */
 }
 
+/* Heading Fade-in Effect */
 h2 {
-  animation: fadeIn 1s ease; /* Keep the fade-in effect for a subtle entrance */
+  animation: fadeIn 1s ease; /* Fade-in effect for headings */
 }
 
-/* Keyframes for fade-in effect */
+/* Keyframes for Fade-in Effect */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -39,8 +47,7 @@ h2 {
   }
 }
 
-
-
+/* Keyframes for Floating Effect (if applied elsewhere) */
 @keyframes floating {
   0%, 100% {
     transform: translateY(0);
@@ -50,6 +57,7 @@ h2 {
   }
 }
 
+/* Rotating Border Animation (optional for specific elements) */
 @keyframes rotate-border {
   from {
     transform: rotate(0deg);
@@ -59,16 +67,7 @@ h2 {
   }
 }
 
+/* Ensure Consistent Spacing and Cleanup */
 h2 {
-  animation: fadeIn 1s ease;
-}
-
-/* Keyframes for fade-in effect */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  animation: fadeIn 1s ease; /* Apply fade-in once, avoid repetition */
 }

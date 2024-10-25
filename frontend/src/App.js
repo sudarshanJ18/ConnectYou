@@ -1,32 +1,21 @@
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
-import Header from './components/Header';
-import Login from './pages/login';  // Make sure your import paths are correct
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Login from './pages/login';  // Ensure correct import paths
 import Signup from './pages/Signup';
-import Footer from './components/Footer';
+import Dashboard from './components/Dashboard'; // Dashboard component
 import LandingPage from './components/LandingPage';
-import Dashboard from './components/Dashboard'; // Your new Dashboard component
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
+
 const App = () => {
-  const location = useLocation(); // Get the current location
-
-  // Determine if the Footer should be hidden based on the current path
-  const shouldShowFooter = !['/login', '/signup'].includes(location.pathname);
-
   return (
     <div>
-      <Header />
-      
       {/* Conditionally render Routes */}
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login togglePage={() => {/* Logic to switch to Signup */}} />} /> {/* Pass toggle function */}
+        <Route path="/signup" element={<Signup togglePage={() => {/* Logic to switch to Login */}} />} /> {/* Pass toggle function */}
         <Route path="/dashboard" element={<Dashboard />} /> {/* Add Dashboard route */}
       </Routes>
-     
-      {/* Conditionally render the Footer */}
-      {shouldShowFooter && <Footer />}
     </div>
   );
 };

@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 import './Signup.css'; 
 import './login.css';
 import { FaGoogle, FaFacebookF, FaLinkedinIn, FaTwitter } from 'react-icons/fa'; 
 import { auth, googleProvider, facebookProvider } from './firebaseConfig';
-import { signInWithPopup, sendPasswordResetEmail } from 'firebase/auth'; 
+import { signInWithPopup, sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth'; 
 
 const Login = ({ togglePage }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate(); // Initialize useNavigate
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
     let validationErrors = {};
@@ -21,7 +23,14 @@ const Login = ({ togglePage }) => {
 
     if (Object.keys(validationErrors).length === 0) {
       console.log('Form submitted:', { email, password });
-      // Handle the actual login process here (e.g., using signInWithEmailAndPassword)
+      try {
+        await signInWithEmailAndPassword(auth, email, password); // Log in with email and password
+        console.log('User signed in successfully');
+        navigate('/dashboard'); // Redirect to the dashboard after successful login
+      } catch (error) {
+        console.error('Error during login:', error);
+        setErrors({ general: 'Login failed. Please check your credentials.' }); // Set general error message
+      }
     } else {
       setErrors(validationErrors);
     }
@@ -45,6 +54,7 @@ const Login = ({ togglePage }) => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       console.log('Google Login:', result.user);
+      navigate('/dashboard'); // Redirect after Google login
     } catch (error) {
       console.error('Error during Google Login:', error);
     }
@@ -54,6 +64,7 @@ const Login = ({ togglePage }) => {
     try {
       const result = await signInWithPopup(auth, facebookProvider);
       console.log('Facebook Login:', result.user);
+      navigate('/dashboard'); // Redirect after Facebook login
     } catch (error) {
       console.error('Error during Facebook Login:', error);
     }
@@ -91,6 +102,7 @@ const Login = ({ togglePage }) => {
             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your password" />
             {errors.password && <p className="error">{errors.password}</p>}
           </div>
+          {errors.general && <p className="error">{errors.general}</p>} {/* Display general error */}
           <button type="submit" className="submit-btn">Login</button>
           <p className="toggle-page">Don't have an account? <span onClick={togglePage} style={{ color: '#3498db', cursor: 'pointer' }}>Signup</span></p>
           <p className="forgot-password" onClick={handleForgotPassword} style={{ color: '#3498db', cursor: 'pointer' }}>Forgot Password?</p>
