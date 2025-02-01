@@ -1,34 +1,89 @@
-import React, { useEffect } from 'react';
-import './Banner.css'; // Ensure you have the CSS for banner styling
-import bannerImage from '../assets/banner-image.jpeg'; // Replace with your banner image path
+import React from 'react';
+import { motion } from 'framer-motion';
+import { ArrowDown } from 'lucide-react';
 
+interface BannerProps {
+  onExploreClick: () => void;
+}
 
-const Banner = ({ onExploreClick }) => {
-  // Add slide-in effect for text and button
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      const bannerContent = document.querySelector('.banner-content');
-      if (bannerContent) {
-        bannerContent.classList.add('slide-in');
-      }
-    }, 500); // Delay for effect
-
-    return () => clearTimeout(timeout);
-  }, []);
-
+const Banner: React.FC<BannerProps> = ({ onExploreClick }) => {
   return (
-    <div className="banner-section" style={{ backgroundImage: `url(${bannerImage})` }}>
-      <div className="overlay"></div>
-      <div className="banner-content">
-        <h1>
-          Welcome to <span className="highlight">Connect</span><span className="highlight-2">You</span>
-        </h1>
-        <button className="explore-btn" onClick={onExploreClick}>
-          Explore <i className="fa-solid fa-arrow-right"></i>
-        </button>
+    <div className="relative h-screen flex items-center justify-center overflow-hidden">
+      {/* Background Image */}
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: 'url(https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="absolute inset-0 bg-black opacity-50"></div>
       </div>
 
-     
+      {/* Content */}
+      <div className="relative z-10 text-center px-4 max-w-4xl">
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-4xl md:text-6xl font-bold text-white mb-6"
+        >
+          Connect with Alumni,
+          <br />
+          Shape Your Future
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-xl text-gray-200 mb-8"
+        >
+          Join our community of students and alumni to unlock opportunities,
+          gain insights, and build lasting connections.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="space-x-4"
+        >
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-medium hover:bg-blue-700 transition-colors"
+          >
+            Get Started
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-white text-blue-600 px-8 py-3 rounded-full text-lg font-medium hover:bg-gray-100 transition-colors"
+          >
+            Learn More
+          </motion.button>
+        </motion.div>
+
+        {/* Scroll Indicator */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+        >
+          <motion.button
+            onClick={onExploreClick}
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+            className="text-white flex flex-col items-center"
+          >
+            <span className="text-sm mb-2">Explore More</span>
+            <ArrowDown className="h-6 w-6" />
+          </motion.button>
+        </motion.div>
+      </div>
     </div>
   );
 };

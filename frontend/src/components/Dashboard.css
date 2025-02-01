@@ -1,117 +1,41 @@
-/* Sidebar styles */
-.dashboard-sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 250px;
-  background-color: #2c3e50;
-  color: white;
-  z-index: 1000;
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.dashboard-sidebar.dashboard-open {
-  transform: translateX(0);
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
 }
 
-.dashboard-sidebar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  background-color: #34495e;
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
 }
 
-.dashboard-toggle-btn {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 24px;
-  cursor: pointer;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-.dashboard-nav-list {
-  padding: 0;
-  margin: 0;
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
 }
 
-.dashboard-nav-item {
-  position: relative;
-}
-
-.dashboard-nav-link {
-  color: #ecf0f1;
-  padding: 10px;
+::-webkit-scrollbar-thumb {
+  background: #c084fc;
   border-radius: 4px;
-  transition: background-color 0.3s ease;
-  display: block;
 }
 
-.dashboard-nav-link:hover {
-  background-color: #34495e;
-}
-
-/* Main Content Area */
-.dashboard-main-content {
-  flex-grow: 1;
-  padding: 20px;
-  transition: margin-left 0.3s ease-in-out;
-}
-
-.dashboard-main-content.dashboard-md-ml-64 {
-  margin-left: 250px;
-}
-
-.dashboard-main-content.dashboard-md-ml-16 {
-  margin-left: 0;
-}
-
-/* Buttons */
-.dashboard-btn {
-  background-color: #1d72b8;
-  color: white;
-  padding: 10px;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
-}
-
-.dashboard-btn:hover {
-  background-color: #155a8a;
-}
-
-.dashboard-text-2xl {
-  font-size: 1.5rem;
-}
-
-.dashboard-font-bold {
-  font-weight: 700;
-}
-
-.dashboard-text-gray-600 {
-  color: #718096;
-}
-
-.dashboard-button-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.dashboard-content-box {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-}
-
-.dashboard-main-content-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-}
-
-.dashboard-container {
-  display: flex;
-  min-height: 100vh;
+::-webkit-scrollbar-thumb:hover {
+  background: #9333ea;
 }

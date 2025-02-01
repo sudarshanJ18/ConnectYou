@@ -1,62 +1,91 @@
 import React from 'react';
-import mentorIcon from '../assets/mentor-icon.png';
-import groupIcon from '../assets/group-icon.jpg';
-import jobsIcon from '../assets/jobs-icon.png';
-import workshopIcon from '../assets/workshop-icon.webp';
-import projectsIcon from '../assets/projects-icon.jpg';
-import resourcesIcon from '../assets/resources-icon.jpg';
-import './Features.css';
+import { motion } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
+import { MessageSquare, Calendar, Award, Target } from 'lucide-react';
 
-const Features = ({ showCards }) => {
+interface FeaturesProps {
+  showCards: boolean;
+}
+
+const Features: React.FC<FeaturesProps> = ({ showCards }) => {
+  const [ref, inView] = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+  });
+
+  const features = [
+    {
+      icon: <MessageSquare className="h-6 w-6" />,
+      title: 'Real-time Chat',
+      description: 'Connect instantly with alumni through our secure messaging platform.',
+    },
+    {
+      icon: <Calendar className="h-6 w-6" />,
+      title: 'Event Scheduling',
+      description: 'Easily schedule mentoring sessions and networking events.',
+    },
+    {
+      icon: <Award className="h-6 w-6" />,
+      title: 'Skill Development',
+      description: 'Access resources and workshops to enhance your professional skills.',
+    },
+    {
+      icon: <Target className="h-6 w-6" />,
+      title: 'Goal Tracking',
+      description: 'Set and track your career goals with guidance from mentors.',
+    },
+  ];
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        duration: 0.6,
+      },
+    },
+  };
+
   return (
-    <div className={`features-section ${showCards ? 'fade-in' : ''}`}>
-      <h5 className="offer">
-        What ConnectYou Offers
-      </h5>
-      <div className="flex flex-col sm:flex-row sm:space-x-4">
-        <div className="w-full sm:w-1/2 bg-gray-100 rounded-lg p-6 shadow-lg">
-          <h6 className="text-2xl font-semibold text-center mb-4">Explore Features</h6>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {[
-              { icon: mentorIcon, title: 'Mentorship', description: 'Connect with alumni for guidance and support.', glowColor: 'rgba(255, 193, 7, 0.5)' },
-              { icon: groupIcon, title: 'Join Groups', description: 'Engage in interest-based groups for collaboration.', glowColor: 'rgba(40, 167, 69, 0.5)' },
-              { icon: jobsIcon, title: 'Job Listings', description: 'Explore job opportunities and internships.', glowColor: 'rgba(23, 162, 184, 0.5)' },
-            ].map((feature, index) => (
-              <div
-                key={index}
-                className="feature-card transition duration-300 relative border rounded-lg shadow-md overflow-hidden p-4 hover:shadow-lg"
-                style={{ '--glow-color': feature.glowColor }}
-              >
-                <div className="glow-card"></div>
-                <img src={feature.icon} alt={feature.title} className="w-16 h-16 mb-4 mx-auto" />
-                <h4 className="text-xl font-semibold text-center mb-2">{feature.title}</h4>
-                <p className="text-gray-700 text-center">{feature.description}</p>
+    <div ref={ref} className="max-w-7xl mx-auto">
+      <motion.div
+        initial="hidden"
+        animate={inView ? 'visible' : 'hidden'}
+        variants={containerVariants}
+        className="grid grid-cols-1 md:grid-cols-2 gap-12"
+      >
+        {features.map((feature, index) => (
+          <motion.div
+            key={index}
+            variants={itemVariants}
+            whileHover={{ scale: 1.02 }}
+            className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
+          >
+            <div className="flex items-center space-x-4">
+              <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                {feature.icon}
               </div>
-            ))}
-          </div>
-        </div>
-        <div className="w-full sm:w-1/2 bg-gray-200 rounded-lg p-6 shadow-lg">
-          <h6 className="text-2xl font-semibold text-center mb-4">More Features</h6>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {[
-              { icon: workshopIcon, title: 'Workshops', description: 'Participate in skill development workshops.', glowColor: 'rgba(255, 0, 0, 0.5)' },
-              { icon: projectsIcon, title: 'Collaborate', description: 'Work together on group projects and initiatives.', glowColor: 'rgba(255, 87, 34, 0.5)' },
-              { icon: resourcesIcon, title: 'Resources', description: 'Access valuable resources for career growth.', glowColor: 'rgba(0, 123, 255, 0.5)' },
-            ].map((feature, index) => (
-              <div
-                key={index}
-                className="feature-card transition duration-300 relative border rounded-lg shadow-md overflow-hidden p-4 hover:shadow-lg"
-                style={{ '--glow-color': feature.glowColor }}
-              >
-                <div className="glow-card"></div>
-                <img src={feature.icon} alt={feature.title} className="w-16 h-16 mb-4 mx-auto" />
-                <h4 className="text-xl font-semibold text-center mb-2">{feature.title}</h4>
-                <p className="text-gray-700 text-center">{feature.description}</p>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 mt-1">{feature.description}</p>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
     </div>
   );
 };

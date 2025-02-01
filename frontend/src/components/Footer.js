@@ -1,58 +1,86 @@
 import React from 'react';
-import './Footer.css'; // CSS file for styling
+import { motion } from 'framer-motion';
+import { GraduationCap, Mail, Phone, MapPin } from 'lucide-react';
 
 const Footer = () => {
+  const footerSections = [
+    {
+      title: 'Company',
+      links: ['About Us', 'Careers', 'Press', 'Blog'],
+    },
+    {
+      title: 'Resources',
+      links: ['Documentation', 'Help Center', 'Privacy Policy', 'Terms of Service'],
+    },
+    {
+      title: 'Contact',
+      items: [
+        { icon: <Mail className="h-5 w-5" />, text: 'contact@connectyou.com' },
+        { icon: <Phone className="h-5 w-5" />, text: '+91 9999999999' },
+        { icon: <MapPin className="h-5 w-5" />, text: 'LPU, Punjab' },
+      ],
+    },
+  ];
+
   return (
-    <footer className="footer">
-      <div className="footer-content">
-        {/* Company Information */}
-        <div className="footer-section about">
-          <h3>ConnectYou</h3>
-          <p>Connecting alumni and students for a brighter future.</p>
+    <footer className="bg-gray-900 text-white py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+          {/* Brand Section */}
+          <div>
+            <div className="flex items-center mb-4">
+              <GraduationCap className="h-8 w-8 text-blue-400" />
+              <span className="ml-2 text-xl font-bold">ConnectYou</span>
+            </div>
+            <p className="text-gray-400">
+              Connecting students with alumni for better career opportunities and mentorship.
+            </p>
+          </div>
+
+          {/* Footer Sections */}
+          {footerSections.map((section, index) => (
+            <div key={index}>
+              <h3 className="text-lg font-semibold mb-4">{section.title}</h3>
+              <ul className="space-y-2">
+                {'links' in section
+                  ? section.links.map((link, linkIndex) => (
+                      <li key={linkIndex}>
+                        <motion.a
+                          href="#"
+                          whileHover={{ x: 5 }}
+                          className="text-gray-400 hover:text-white transition-colors"
+                        >
+                          {link}
+                        </motion.a>
+                      </li>
+                    ))
+                  : section.items?.map((item, itemIndex) => (
+                      <li key={itemIndex} className="flex items-center space-x-2 text-gray-400">
+                        {item.icon}
+                        <span>{item.text}</span>
+                      </li>
+                    ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
-        {/* Contact Information */}
-        <div className="footer-section contact">
-          <h3>Contact Us</h3>
-          <p>Email: <a href="mailto:support@connectyou.com">support@connectyou.com</a></p>
-          <p>Phone: +91 12345 67890</p>
-          <p>Address: 123, Tech Park, Bengaluru, India</p>
-        </div>
-
-        {/* Quick Links Section */}
-        <div className="footer-section links">
-          <h3>Quick Links</h3>
-          <ul>
-            <li><a href="/alumni-blogs">Alumni Blogs</a></li>
-            <li><a href="/tech-news">Today's Tech News</a></li>
-            <li><a href="/mentorship">Mentorship Programs</a></li>
-            <li><a href="/open-projects">Open Projects</a></li>
-            <li><a href="/workshops">Workshops & Events</a></li>
-          </ul>
-        </div>
-
-        {/* Social Links with Icons */}
-        <div className="footer-section social">
-          <h3>Follow Us</h3>
-          <div className="social-links">
-            <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
-              <i className="fab fa-facebook-f"></i>
-            </a>
-            <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer">
-              <i className="fab fa-twitter"></i>
-            </a>
-            <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
-              <i className="fab fa-linkedin-in"></i>
-            </a>
-            <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
-              <i className="fab fa-instagram"></i>
-            </a>
+        <div className="mt-12 pt-8 border-t border-gray-800">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <p className="text-gray-400 text-sm">
+              © 2025 ConnectYou. All rights reserved.
+            </p>
+            <div className="mt-4 md:mt-0">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors"
+              >
+                Join Now
+              </motion.button>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div className="footer-bottom">
-        <p>© 2024 ConnectYou. All rights reserved.</p>
       </div>
     </footer>
   );

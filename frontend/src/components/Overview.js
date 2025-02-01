@@ -1,54 +1,98 @@
-import React, { useState } from 'react';
-import './Overview.css'; // Make sure the path is correct
+import React from 'react';
+import { motion } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
+import { Users, Briefcase, BookOpen } from 'lucide-react';
 
-// Import images
-import LPUImage from '../assets/LPU.jpg'; // Ensure correct image path
-import LPUImage2 from '../assets/LPU2.jpeg'; // Ensure correct image path
+interface OverviewProps {
+  showCards: boolean;
+}
 
-const Overview = ({ showCards }) => {
-  const [openCard, setOpenCard] = useState(null);
+const Overview: React.FC<OverviewProps> = ({ showCards }) => {
+  const [ref, inView] = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+  });
 
-  const toggleCard = (index) => {
-    setOpenCard(openCard === index ? null : index);
+  const cards = [
+    {
+      icon: <Users className="h-8 w-8 text-blue-600" />,
+      title: 'Connect with Alumni',
+      description: 'Build meaningful relationships with graduates who share your interests and career goals.',
+    },
+    {
+      icon: <Briefcase className="h-8 w-8 text-blue-600" />,
+      title: 'Career Opportunities',
+      description: 'Access exclusive job postings and internship opportunities shared by our alumni network.',
+    },
+    {
+      icon: <BookOpen className="h-8 w-8 text-blue-600" />,
+      title: 'Mentorship Programs',
+      description: 'Get guidance from experienced professionals who can help shape your career path.',
+    },
+  ];
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+      },
+    },
   };
 
   return (
-    <div className="overview-container">
-      <div className={`card ${showCards ? 'fade-in' : ''}`}>
-        <div className={`image-container ${openCard === 0 ? 'slide-up' : ''}`}>
-          <img src={LPUImage} alt="LPU" className="card-image" />
-        </div>
-        <button className="arrow-button" onClick={() => toggleCard(0)}>
-          <span className={`arrow ${openCard === 0 ? 'open' : ''}`}>▼</span>
-        </button>
-        <div className={`card-text ${openCard === 0 ? 'open' : ''}`}>
-          <h3><b>About Lovely Professional University</b></h3>
-          <p>
-            Lovely Professional University (LPU) is a leading global university, known for its diverse programs and vibrant campus life.
-            It offers a variety of undergraduate, postgraduate, and doctoral programs across multiple disciplines, fostering holistic
-            development through academic excellence and extracurricular activities.
-          </p>
-        </div>
-      </div>
+    <div ref={ref} className="max-w-7xl mx-auto">
+      <motion.div
+        initial="hidden"
+        animate={inView ? 'visible' : 'hidden'}
+        variants={containerVariants}
+        className="text-center mb-16"
+      >
+        <motion.h2
+          variants={itemVariants}
+          className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
+        >
+          Why Choose ConnectYou?
+        </motion.h2>
+        <motion.p
+          variants={itemVariants}
+          className="text-xl text-gray-600 max-w-2xl mx-auto"
+        >
+          We provide the tools and connections you need to succeed in your career journey.
+        </motion.p>
+      </motion.div>
 
-      <div className={`card ${showCards ? 'fade-in' : ''}`}>
-        <div className={`image-container ${openCard === 1 ? 'slide-up' : ''}`}>
-          <img src={LPUImage2} alt="ConnectYou" className="card-image" />
-        </div>
-        <button className="arrow-button" onClick={() => toggleCard(1)}>
-          <span className={`arrow ${openCard === 1 ? 'open' : ''}`}>▼</span>
-        </button>
-        <div className={`card-text ${openCard === 1 ? 'open' : ''}`}>
-          <h3><b>About ConnectYou Application</b></h3>
-          <p>
-            <i className="fa-solid fa-arrow-right"></i> ConnectYou is an innovative platform designed to bridge the gap between alumni and students. 
-            It facilitates meaningful connections, mentorship opportunities, and collaboration on projects, ensuring a vibrant community that supports personal and professional growth.
-            <br /><i className="fa-solid fa-arrow-right"></i> ConnectYou is to create a platform that fosters connections and enhances communication among users, potentially within a community or network. 
-            It could serve various purposes, such as facilitating social interaction, professional networking, or collaboration.
-          </p>
-        </div>
-      </div>
-      
+      <motion.div
+        initial="hidden"
+        animate={showCards && inView ? 'visible' : 'hidden'}
+        variants={containerVariants}
+        className="grid grid-cols-1 md:grid-cols-3 gap-8"
+      >
+        {cards.map((card, index) => (
+          <motion.div
+            key={index}
+            variants={itemVariants}
+            whileHover={{ y: -5 }}
+            className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow"
+          >
+            <div className="mb-4">{card.icon}</div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">{card.title}</h3>
+            <p className="text-gray-600">{card.description}</p>
+          </motion.div>
+        ))}
+      </motion.div>
     </div>
   );
 };
