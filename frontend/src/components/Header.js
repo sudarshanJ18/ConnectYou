@@ -1,42 +1,110 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate instead of useHistory
-import lpuLogo from '../assets/lpu-logo.png';
+import React, { useState, useEffect } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { Menu, X, GraduationCap } from 'lucide-react';
 
 const Header = () => {
-  const navigate = useNavigate(); // Hook for navigation
+  const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const { scrollY } = useScroll();
+  
+  const headerBackground = useTransform(
+    scrollY,
+    [0, 50],
+    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.9)']
+  );
 
-  const handleLogin = () => {
-    navigate('/login'); // Navigate to login page
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  const handleSignup = () => {
-    navigate('/signup'); // Navigate to signup page
-  };
+  const menuItems = [
+    { name: 'Home', href: '#' },
+    { name: 'Features', href: '#features' },
+    { name: 'Alumni', href: '#alumni' },
+    { name: 'Resources', href: '#resources' },
+  ];
 
   return (
-    <header className="flex justify-between items-center w-full p-4 bg-black">
-      <div className="flex items-center">
-        <img src={lpuLogo} alt="LPU Logo" className="w-24 h-auto mr-2" />
-        <div className="flex flex-col">
-          <h1 className="text-2xl text-white">ConnectYou</h1>
-          <p className="text-gray-400">Alumni & Student Engagement Hub</p>
+    <motion.header
+      style={{ backgroundColor: headerBackground }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-shadow ${
+        isScrolled ? 'shadow-md backdrop-blur-sm' : ''
+      }`}
+    >
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center"
+          >
+            <GraduationCap className="h-8 w-8 text-blue-600" />
+            <span className="ml-2 text-xl font-bold text-gray-900">ConnectYou</span>
+          </motion.div>
+
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center space-x-8">
+            {menuItems.map((item, index) => (
+              <motion.a
+                key={item.name}
+                href={item.href}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="text-gray-700 hover:text-blue-600 transition-colors"
+              >
+                {item.name}
+              </motion.a>
+            ))}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors"
+            >
+              Sign In
+
+          
+            </motion.button>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
-      </div>
-      <div className="flex space-x-4">
-        <button 
-          onClick={handleLogin} 
-          className="bg-blue-400 hover:bg-blue-500 text-black py-2 px-4 rounded"
+
+        {/* Mobile Menu */}
+        <motion.div
+          initial={false}
+          animate={{ height: isOpen ? 'auto' : 0 }}
+          className={`md:hidden overflow-hidden ${isOpen ? 'pb-4' : ''}`}
         >
-          Login
-        </button>
-        <button 
-          onClick={handleSignup} 
-          className="bg-blue-800 hover:bg-blue-900 text-white py-2 px-4 rounded"
-        >
-          Signup
-        </button>
-      </div>
-    </header>
+          <div className="space-y-2">
+            {menuItems.map((item) => (
+              <a
+                key={item.name}
+                href={item.href}
+                className="block px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors"
+              >
+                {item.name}
+              </a>
+            ))}
+            <button className="w-full bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors">
+              Sign In
+            </button>
+          </div>
+        </motion.div>
+      </nav>
+    </motion.header>
   );
 };
 
