@@ -2,17 +2,32 @@ import React, { useState, useEffect } from "react";
 import {
   Bell, MessageSquare, LogOut, ChevronRight, User, BookOpen, 
   Briefcase, Calendar, Users, HelpCircle, LineChart, GraduationCap, 
-  Play, Book, Award
+  Play, Book, Award, Clock, MapPin
 } from "lucide-react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { 
+ 
+  Routes, 
+  Route, 
+  Link, 
+  Navigate 
+} from "react-router-dom";
 
-// Main Dashboard Content Component
+// Import page components
+import AIAssistantPage from "../pages/Dashboard/AIAssistantPage";
+import ELearningPage from "../pages/Dashboard/ELearningPage";
+import JobsPage from "../pages/Dashboard/JobsPage";
+import MentorPage from "../pages/Dashboard/MentorPage";
+import MessagesPage from "../pages/Dashboard/MessagesPage";
+import OpenProjectsPage from "../pages/Dashboard/OpenProjectsPage";
+import WorkshopsPage from "../pages/Dashboard/WorkshopsPage";
+
+// Dashboard Content Component
 const DashboardContent = () => {
-  const [notifications] = useState([
+  const notifications = [
     { id: 1, text: 'New mentor match available!', type: 'success' },
     { id: 2, text: 'Upcoming workshop: Advanced React', type: 'info' },
     { id: 3, text: 'Career fair next week', type: 'warning' }
-  ]);
+  ];
 
   const featuredServices = [
     {
@@ -42,7 +57,7 @@ const DashboardContent = () => {
       duration: '8 weeks',
       instructor: 'Dr. Sarah Chen',
       nextLesson: 'State Management with Redux',
-      image: '/api/placeholder/800/400'
+      image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=800&q=80'
     },
     {
       title: 'Cloud Architecture Fundamentals',
@@ -50,7 +65,7 @@ const DashboardContent = () => {
       duration: '10 weeks',
       instructor: 'Mark Rodriguez',
       nextLesson: 'Microservices Architecture',
-      image: '/api/placeholder/800/400'
+      image: 'https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?auto=format&fit=crop&w=800&q=80'
     },
     {
       title: 'Data Science Masterclass',
@@ -58,7 +73,7 @@ const DashboardContent = () => {
       duration: '12 weeks',
       instructor: 'Dr. Emily Watson',
       nextLesson: 'Machine Learning Basics',
-      image: '/api/placeholder/800/400'
+      image: 'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?auto=format&fit=crop&w=800&q=80'
     }
   ];
 
@@ -69,7 +84,7 @@ const DashboardContent = () => {
       company: 'TechCorp',
       expertise: 'Machine Learning, Neural Networks',
       availability: 'Available for mentoring',
-      image: '/api/placeholder/800/400'
+      image: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=800&q=80'
     },
     {
       name: 'Mark Rodriguez',
@@ -77,7 +92,7 @@ const DashboardContent = () => {
       company: 'GlobalTech',
       expertise: 'System Design, Cloud Architecture',
       availability: 'Available for workshops',
-      image: '/api/placeholder/800/400'
+      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=800&q=80'
     },
     {
       name: 'Dr. Emily Watson',
@@ -85,13 +100,14 @@ const DashboardContent = () => {
       company: 'DataCo',
       expertise: 'Big Data, Analytics',
       availability: 'Available for project review',
-      image: '/api/placeholder/800/400'
+      image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=800&q=80'
     }
   ];
 
   return (
+    
     <>
-      {/* Notifications */}
+      {/* Notifications Section */}
       <div className="space-y-2 mb-6">
         {notifications.map((notification, index) => (
           <div 
@@ -108,7 +124,7 @@ const DashboardContent = () => {
         ))}
       </div>
 
-      {/* Current Courses */}
+      {/* Courses Section */}
       <h3 className="text-lg font-semibold mb-4">Your Learning Journey</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {courses.map((course, index) => (
@@ -124,16 +140,12 @@ const DashboardContent = () => {
               
               <div className="relative pt-1">
                 <div className="flex mb-2 items-center justify-between">
-                  <div>
-                    <span className="text-xs font-semibold inline-block text-purple-600">
-                      Progress: {course.progress}%
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs font-semibold inline-block text-purple-600">
-                      {course.duration}
-                    </span>
-                  </div>
+                  <span className="text-xs font-semibold inline-block text-purple-600">
+                    Progress: {course.progress}%
+                  </span>
+                  <span className="text-xs font-semibold inline-block text-purple-600">
+                    {course.duration}
+                  </span>
                 </div>
                 <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-purple-200">
                   <div 
@@ -153,7 +165,7 @@ const DashboardContent = () => {
         ))}
       </div>
 
-      {/* Featured Services */}
+      {/* Featured Services Section */}
       <h3 className="text-lg font-semibold mb-4">Featured Services</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {featuredServices.map((service, index) => (
@@ -173,7 +185,7 @@ const DashboardContent = () => {
         ))}
       </div>
 
-      {/* Featured Instructors */}
+      {/* Instructors Section */}
       <h3 className="text-lg font-semibold mb-4">Featured Instructors</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {instructors.map((instructor, index) => (
@@ -205,24 +217,125 @@ const DashboardContent = () => {
   );
 };
 
-// Other Page Components
-const ELearningPage = () => <div className="p-6">E-Learning Resources</div>;
-const MentorshipPage = () => <div className="p-6">Mentorship Program</div>;
-const JobsPage = () => <div className="p-6">Jobs & Internships</div>;
-const MessagesPage = () => <div className="p-6">Your Messages</div>;
-const EventsPage = () => <div className="p-6">Upcoming Events</div>;
-const OpenProjectsPage = () => <div className="p-6">Explore Open Projects</div>;
-const AIAssistantPage = () => <div className="p-6">AI Assistant</div>;
-const WorkshopsPage = () => <div className="p-6">Skill Workshops</div>;
-const ProfilePage = () => <div className="p-6">Your Profile</div>;
+// Profile Page Component
+const ProfilePage = () => {
+  const userProfile = {
+    name: "Alex Johnson",
+    role: "Software Developer",
+    email: "alex.j@example.com",
+    location: "San Francisco, CA",
+    skills: ["React", "Node.js", "Python", "AWS"],
+    education: "MS Computer Science",
+    interests: ["AI/ML", "Web Development", "Cloud Architecture"]
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto">
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="flex items-center mb-6">
+          <div className="w-24 h-24 bg-purple-200 rounded-full flex items-center justify-center">
+            <User className="w-12 h-12 text-purple-600" />
+          </div>
+          <div className="ml-6">
+            <h2 className="text-2xl font-bold">{userProfile.name}</h2>
+            <p className="text-gray-600">{userProfile.role}</p>
+            <p className="text-gray-500">{userProfile.location}</p>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h3 className="text-lg font-semibold mb-3">Contact Information</h3>
+            <p className="text-gray-600 mb-2">Email: {userProfile.email}</p>
+          </div>
+          
+          <div>
+            <h3 className="text-lg font-semibold mb-3">Education</h3>
+            <p className="text-gray-600">{userProfile.education}</p>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold mb-3">Skills</h3>
+          <div className="flex flex-wrap gap-2">
+            {userProfile.skills.map(skill => (
+              <span key={skill} className="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-sm">
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold mb-3">Interests</h3>
+          <div className="flex flex-wrap gap-2">
+            {userProfile.interests.map(interest => (
+              <span key={interest} className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">
+                {interest}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Events Page Component
+const EventsPage = () => {
+  const events = [
+    {
+      title: "Tech Career Fair 2025",
+      date: "March 15, 2025",
+      time: "10:00 AM - 4:00 PM",
+      location: "Virtual Event",
+      description: "Connect with top tech companies and explore career opportunities."
+    },
+    {
+      title: "Web Development Workshop",
+      date: "March 20, 2025",
+      time: "2:00 PM - 5:00 PM",
+      location: "Online",
+      description: "Learn modern web development practices and tools."
+    }
+  ];
+
+  return (
+    <div className="max-w-6xl mx-auto">
+      <h2 className="text-2xl font-bold mb-6">Upcoming Events</h2>
+      <div className="grid gap-6">
+        {events.map((event) => (
+          <div key={event.title} className="bg-white rounded-lg shadow-md p-6">
+            <h3 className="text-xl font-semibold mb-2">{event.title}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <p className="text-gray-600"><Calendar className="inline w-4 h-4 mr-2" />{event.date}</p>
+                <p className="text-gray-600"><Clock className="inline w-4 h-4 mr-2" />{event.time}</p>
+              </div>
+              <div>
+                <p className="text-gray-600"><MapPin className="inline w-4 h-4 mr-2" />{event.location}</p>
+              </div>
+            </div>
+            <p className="text-gray-700">{event.description}</p>
+            <button className="mt-4 bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition-colors duration-200">
+              Register Now
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 // Main Dashboard Component
 const Dashboard = () => {
   const [activeMenuItem, setActiveMenuItem] = useState("Dashboard");
   const [isLoading, setIsLoading] = useState(true);
 
+
   useEffect(() => {
-    setTimeout(() => setIsLoading(false), 1000);
+    const timer = setTimeout(() => setIsLoading(false), 1000);
+    return () => clearTimeout(timer);
   }, []);
 
   const menuItems = [
@@ -237,6 +350,7 @@ const Dashboard = () => {
     { name: "Workshops", icon: <Users className="w-4 h-4" />, path: "/workshops" },
     { name: "Profile", icon: <User className="w-4 h-4" />, path: "/profile" }
   ];
+  
 
   if (isLoading) {
     return (
@@ -247,58 +361,58 @@ const Dashboard = () => {
   }
 
   return (
-    <Router>
-      <div className="flex h-screen bg-gray-100">
-        {/* Sidebar */}
-        <div className="w-64 bg-white shadow-lg">
-          <div className="p-4">
-            <h1 className="text-2xl font-bold text-purple-600 animate-fade-in">ConnectYou</h1>
-          </div>
-          <nav className="mt-4">
-            {menuItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                onClick={() => setActiveMenuItem(item.name)}
-                className={`w-full flex items-center px-4 py-3 text-sm transition-all duration-200 ease-in-out ${
-                  activeMenuItem === item.name
-                    ? "bg-purple-50 text-purple-600 border-r-4 border-purple-600"
-                    : "text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                {item.icon}
-                <span className="ml-3">{item.name}</span>
-              </Link>
-            ))}
-          </nav>
+    
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <div className="w-64 bg-white shadow-lg">
+        <div className="p-4">
+          <h1 className="text-2xl font-bold text-purple-600 animate-fade-in">ConnectYou</h1>
         </div>
+        <nav className="mt-4">
+          {menuItems.map((item) => (
+            <Link
+              key={item.name}
+              to={item.path}
+              onClick={() => setActiveMenuItem(item.name)}
+              className={`w-full flex items-center px-4 py-3 text-sm transition-all duration-200 ease-in-out ${
+                activeMenuItem === item.name
+                  ? "bg-purple-50 text-purple-600 border-r-4 border-purple-600"
+                  : "text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              {item.icon}
+              <span className="ml-3">{item.name}</span>
+            </Link>
+          ))}
+        </nav>
+      </div>
 
-        {/* Main Content */}
-        <div className="flex-1 overflow-auto">
-          {/* Header */}
-          <header className="bg-white shadow-sm sticky top-0 z-10">
-            <div className="flex items-center justify-between px-6 py-4">
-              <h2 className="text-xl font-semibold text-gray-800">Welcome back, Alex!</h2>
-              <div className="flex items-center space-x-4">
-                <button className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200">
-                  <Bell className="h-5 w-5" />
-                </button>
-                <button className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200">
-                  <User className="h-5 w-5" />
-                </button>
-                <button className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200">
-                  <LogOut className="h-5 w-5" />
-                </button>
-              </div>
+      {/* Main Content */}
+      <div className="flex-1 overflow-auto">
+        {/* Header */}
+        <header className="bg-white shadow-sm sticky top-0 z-10">
+          <div className="flex items-center justify-between px-6 py-4">
+            <h2 className="text-xl font-semibold text-gray-800">Welcome back, Alex!</h2>
+            <div className="flex items-center space-x-4">
+              <button className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200">
+                <Bell className="h-5 w-5" />
+              </button>
+              <button className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200">
+                <User className="h-5 w-5" />
+              </button>
+              <button className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200">
+                <LogOut className="h-5 w-5" />
+              </button>
             </div>
-          </header>
+          </div>
+        </header>
 
-          {/* Routes */}
-          <main className="p-6">
-            <Routes>
+        {/* Routes */}
+        <main className="p-6">
+        <Routes>
               <Route path="/" element={<DashboardContent />} />
               <Route path="/e-learning" element={<ELearningPage />} />
-              <Route path="/mentorship" element={<MentorshipPage />} />
+              <Route path="/mentorship" element={<MentorPage />} />
               <Route path="/jobs" element={<JobsPage />} />
               <Route path="/messages" element={<MessagesPage />} />
               <Route path="/events" element={<EventsPage />} />
@@ -306,138 +420,12 @@ const Dashboard = () => {
               <Route path="/ai-assistant" element={<AIAssistantPage />} />
               <Route path="/workshops" element={<WorkshopsPage />} />
               <Route path="/profile" element={<ProfilePage />} />
-              </Routes>
-            </main>
-          </div>
-        </div>
-      </Router>
-    );
-  };
-  
-  // Add specific page components with more content
-  const ProfileComponent = () => {
-    const userProfile = {
-      name: "Alex Johnson",
-      role: "Software Developer",
-      email: "alex.j@example.com",
-      location: "San Francisco, CA",
-      skills: ["React", "Node.js", "Python", "AWS"],
-      education: "MS Computer Science",
-      interests: ["AI/ML", "Web Development", "Cloud Architecture"]
-    };
-  
-    return (
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex items-center mb-6">
-            <div className="w-24 h-24 bg-purple-200 rounded-full flex items-center justify-center">
-              <User className="w-12 h-12 text-purple-600" />
-            </div>
-            <div className="ml-6">
-              <h2 className="text-2xl font-bold">{userProfile.name}</h2>
-              <p className="text-gray-600">{userProfile.role}</p>
-              <p className="text-gray-500">{userProfile.location}</p>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Contact Information</h3>
-              <p className="text-gray-600 mb-2">Email: {userProfile.email}</p>
-            </div>
-            
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Education</h3>
-              <p className="text-gray-600">{userProfile.education}</p>
-            </div>
-          </div>
-  
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-3">Skills</h3>
-            <div className="flex flex-wrap gap-2">
-              {userProfile.skills.map(skill => (
-                <span key={skill} className="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-sm">
-                  {skill}
-                </span>
-              ))}
-            </div>
-          </div>
-  
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-3">Interests</h3>
-            <div className="flex flex-wrap gap-2">
-              {userProfile.interests.map(interest => (
-                <span key={interest} className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">
-                  {interest}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+        </main>
       </div>
-    );
-  };
-  
-  // Enhanced E-Learning Page
-  const EnhancedELearningPage = () => {
-    const learningPaths = [
-      {
-        title: "Web Development",
-        courses: ["HTML & CSS Basics", "JavaScript Fundamentals", "React Mastery"],
-        progress: 65
-      },
-      {
-        title: "Data Science",
-        courses: ["Python for Data Science", "Statistical Analysis", "Machine Learning"],
-        progress: 30
-      },
-      {
-        title: "Cloud Computing",
-        courses: ["AWS Fundamentals", "Docker & Kubernetes", "Cloud Architecture"],
-        progress: 45
-      }
-    ];
-  
-    return (
-      <div className="max-w-6xl mx-auto">
-        <h2 className="text-2xl font-bold mb-6">Learning Paths</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {learningPaths.map((path, index) => (
-            <div key={path.title} className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-xl font-semibold mb-4">{path.title}</h3>
-              <div className="mb-4">
-                <div className="flex justify-between text-sm text-gray-600 mb-2">
-                  <span>Progress</span>
-                  <span>{path.progress}%</span>
-                </div>
-                <div className="h-2 bg-gray-200 rounded-full">
-                  <div 
-                    className="h-2 bg-purple-600 rounded-full transition-all duration-300"
-                    style={{ width: `${path.progress}%` }}
-                  ></div>
-                </div>
-              </div>
-              <div className="space-y-2">
-                {path.courses.map((course, courseIndex) => (
-                  <div key={courseIndex} className="flex items-center text-gray-700">
-                    <div className="w-2 h-2 bg-purple-600 rounded-full mr-2"></div>
-                    {course}
-                  </div>
-                ))}
-              </div>
-              <button className="mt-4 w-full bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition-colors duration-200">
-                Continue Learning
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-  
-  // Update the route components with enhanced versions
-  
-  ProfilePage.element = <ProfileComponent />;
-  ELearningPage.element = <EnhancedELearningPage />;
-  
-  export default Dashboard;
+    </div>
+  );
+};
+
+export default Dashboard;
