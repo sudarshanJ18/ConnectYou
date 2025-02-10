@@ -1,16 +1,18 @@
-const express = require('express');
-const User = require('../models/User');
-const { verifyToken } = require('../middleware/auth'); // Middleware for token verification
+const express = require("express");
+const User = require("../models/User");
+
 const router = express.Router();
 
-// GET current user data
-router.get('/me', verifyToken, async (req, res) => {
-    try {
-        const user = await User.findById(req.user.id).select('-password');
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
-    }
+// Create a user
+router.post("/register", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    const newUser = new User({ name, email, password });
+    await newUser.save();
+    res.status(201).json({ message: "User created successfully!" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;
