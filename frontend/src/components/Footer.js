@@ -1,23 +1,26 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { GraduationCap, Mail, Phone, MapPin } from 'lucide-react';
+import React from "react";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { GraduationCap, Mail, Phone, MapPin } from "lucide-react";
 
 const Footer = () => {
+  const navigate = useNavigate(); // ✅ Initialize navigation
+
   const footerSections = [
     {
-      title: 'Company',
-      links: ['About Us', 'Careers', 'Press', 'Blog'],
+      title: "Company",
+      links: ["About Us", "Careers", "Press", "Blog"],
     },
     {
-      title: 'Resources',
-      links: ['Documentation', 'Help Center', 'Privacy Policy', 'Terms of Service'],
+      title: "Resources",
+      links: ["Documentation", "Help Center", "Privacy Policy", "Terms of Service"],
     },
     {
-      title: 'Contact',
+      title: "Contact",
       items: [
-        { icon: <Mail className="h-5 w-5" />, text: 'contact@connectyou.com' },
-        { icon: <Phone className="h-5 w-5" />, text: '+91 9999999999' },
-        { icon: <MapPin className="h-5 w-5" />, text: 'LPU, Punjab' },
+        { icon: <Mail className="h-5 w-5" />, text: "contact@connectyou.com" },
+        { icon: <Phone className="h-5 w-5" />, text: "+91 9999999999" },
+        { icon: <MapPin className="h-5 w-5" />, text: "LPU, Punjab" },
       ],
     },
   ];
@@ -42,7 +45,7 @@ const Footer = () => {
             <div key={index}>
               <h3 className="text-lg font-semibold mb-4">{section.title}</h3>
               <ul className="space-y-2">
-                {'links' in section
+                {"links" in section
                   ? section.links.map((link, linkIndex) => (
                       <li key={linkIndex}>
                         <motion.a
@@ -67,13 +70,13 @@ const Footer = () => {
 
         <div className="mt-12 pt-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm">
-              © 2025 ConnectYou. All rights reserved.
-            </p>
+            <p className="text-gray-400 text-sm">© 2025 ConnectYou. All rights reserved.</p>
             <div className="mt-4 md:mt-0">
+              {/* ✅ "Join Now" Button with Navigation */}
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => navigate("/signup")} // ✅ Navigate to Signup page
                 className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors"
               >
                 Join Now

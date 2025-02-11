@@ -4,6 +4,15 @@ import Signup from './pages/Signup';
 import Dashboard from './components/Dashboard';
 import LandingPage from './components/LandingPage';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import AIAssistantPage from "./pages/Dashboard/AIAssistantPage";
+import ELearningPage from "./pages/Dashboard/ELearningPage";
+import JobsPage from "./pages/Dashboard/JobsPage";
+import MentorPage from "./pages/Dashboard/MentorPage";
+import MessagesPage from "./pages/Dashboard/MessagesPage";
+import OpenProjectsPage from "./pages/Dashboard/OpenProjectsPage";
+import WorkshopsPage from "./pages/Dashboard/WorkshopsPage";
+import ProfilePage from "./pages/Dashboard/ProfilePage";
+import EventsPage from "./pages/Dashboard/EventsPage";
 
 const App = () => {
   const navigate = useNavigate();
@@ -48,6 +57,17 @@ const App = () => {
 
         {/* Dashboard Page */}
         <Route path="/dashboard" element={<Dashboard />} />
+        {/* <Route path="/" element={<DashboardContent />} /> */}
+              <Route path="/e-learning" element={<ELearningPage />} />
+              <Route path="/mentorship" element={<MentorPage />} />
+              <Route path="/jobs" element={<JobsPage />} />
+              <Route path="/messages" element={<MessagesPage />} />
+              <Route path="/events" element={<EventsPage />} />
+              <Route path="/open-projects" element={<OpenProjectsPage />} />
+              <Route path="/ai-assistant" element={<AIAssistantPage />} />
+              <Route path="/workshops" element={<WorkshopsPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
       </Routes>
     </div>
   );

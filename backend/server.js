@@ -1,23 +1,23 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const cors = require("cors");
+const authRoutes = require("./routes/auth");
 
-dotenv.config();  // Load environment variables
-
+dotenv.config();
 const app = express();
-app.use(express.json());
 
-// MongoDB Connection
+app.use(express.json());
+app.use(cors());
+
+
 mongoose
-  .connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
+// Routes
+app.use("/auth", authRoutes);
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-
-const userRoutes = require("./routes/users");
-app.use("/users", userRoutes);

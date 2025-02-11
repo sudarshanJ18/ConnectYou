@@ -1,38 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { Menu, X, GraduationCap } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { Menu, X, GraduationCap } from "lucide-react";
+import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { scrollY } = useScroll();
-  
+  const navigate = useNavigate(); // ✅ Initialize navigate
+
   const headerBackground = useTransform(
     scrollY,
     [0, 50],
-    ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.9)']
+    ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0.9)"]
   );
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const menuItems = [
-    { name: 'Home', href: '#' },
-    { name: 'Features', href: '#features' },
-    { name: 'Alumni', href: '#alumni' },
-    { name: 'Resources', href: '#resources' },
-  ];
 
   return (
     <motion.header
       style={{ backgroundColor: headerBackground }}
       className={`fixed top-0 left-0 right-0 z-50 transition-shadow ${
-        isScrolled ? 'shadow-md backdrop-blur-sm' : ''
+        isScrolled ? "shadow-md backdrop-blur-sm" : ""
       }`}
     >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -43,31 +38,21 @@ const Header = () => {
             className="flex items-center"
           >
             <GraduationCap className="h-8 w-8 text-blue-600" />
-            <span className="ml-2 text-xl font-bold text-gray-900">ConnectYou</span>
+            <span className="ml-2 text-xl font-bold text-gray-900">
+              ConnectYou
+            </span>
           </motion.div>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
-            {menuItems.map((item, index) => (
-              <motion.a
-                key={item.name}
-                href={item.href}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="text-gray-700 hover:text-blue-600 transition-colors"
-              >
-                {item.name}
-              </motion.a>
-            ))}
+            {/* ✅ Sign In Button with Navigation */}
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => navigate("/login")} // ✅ Navigate to /login
               className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors"
             >
               Sign In
-
-          
             </motion.button>
           </div>
 
@@ -85,20 +70,15 @@ const Header = () => {
         {/* Mobile Menu */}
         <motion.div
           initial={false}
-          animate={{ height: isOpen ? 'auto' : 0 }}
-          className={`md:hidden overflow-hidden ${isOpen ? 'pb-4' : ''}`}
+          animate={{ height: isOpen ? "auto" : 0 }}
+          className={`md:hidden overflow-hidden ${isOpen ? "pb-4" : ""}`}
         >
           <div className="space-y-2">
-            {menuItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="block px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors"
-              >
-                {item.name}
-              </a>
-            ))}
-            <button className="w-full bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors">
+            {/* ✅ Mobile Sign In Button with Navigation */}
+            <button
+              onClick={() => navigate("/login")} // ✅ Navigate to /login
+              className="w-full bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors"
+            >
               Sign In
             </button>
           </div>
