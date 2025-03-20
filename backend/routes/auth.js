@@ -1,92 +1,125 @@
-const express = require("express");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
-const admin = require("../firebaseAdmin");
-
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 const router = express.Router();
 
-// 🔹 User Registration (Email/Password)
-router.post("/register", async (req, res) => {
+// Auth middleware
+const authMiddleware = (req, res, next) => {
   try {
-    const { firstName, lastName, email, password, phone, userType, university, branch, yearOfStudy, studentId, graduationYear, currentCompany, jobTitle, industry } = req.body;
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({ message: 'No token, authorization denied' });
+    }
 
-    // Check if email already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) return res.status(400).json({ message: "Email already exists!" });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    res.status(401).json({ message: 'Token is invalid' });
+  }
+};
 
-    // Hash Password
+// Register user
+router.post('/register', async (req, res) => {
+  try {
+    const { firstName, lastName, email, password, userType } = req.body;
+
+    let user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create User
-    const newUser = new User({
-      firstName, lastName, email, password: hashedPassword, phone, userType,
-      university, branch, yearOfStudy, studentId,
-      graduationYear, currentCompany, jobTitle, industry
+    user = new User({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+      userType,
+      ...req.body
     });
 
-    await newUser.save();
-    res.status(201).json({ message: "User registered successfully!" });
+    await user.save();
+
+    const payload = {
+      user: {
+        id: user._id,
+        email: user.email
+      }
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+    res.status(201).json({
+      token,
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        userType: user.userType
+      }
+    });
 
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Registration error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
-// 🔹 User Login (Email/Password)
-router.post("/login", async (req, res) => {
+// Login user
+router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Check if user exists
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "User not found!" });
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
 
-    // Validate Password
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials!" });
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
 
-    // Generate JWT Token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    const payload = {
+      user: {
+        id: user._id,
+        email: user.email
+      }
+    };
 
-    res.json({ token, user });
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        userType: user.userType
+      }
+    });
 
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
-// 🔹 Verify Firebase Token and Store User in MongoDB (Social Login)
-router.post("/verify-firebase-token", async (req, res) => {
-  const { token, additionalData } = req.body;
-
+// Get current user
+router.get('/me', authMiddleware, async (req, res) => {
   try {
-    // Verify Firebase Token
-    const decodedToken = await admin.auth().verifyIdToken(token);
-    const { uid, email, phone_number } = decodedToken;
-
-    // Check if user exists in MongoDB
-    let user = await User.findOne({ firebaseUID: uid });
-
-    if (!user) {
-      // Create new user
-      user = new User({
-        firebaseUID: uid,
-        email,
-        phone: phone_number || "",
-        ...additionalData, // Extra data from frontend (firstName, lastName, etc.)
-      });
-
-      await user.save();
-    }
-
-    // Generate JWT Token for API security
-    const jwtToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-
-    res.json({ message: "User verified & stored in MongoDB", user, jwtToken });
+    const user = await User.findById(req.user.user.id).select('-password');
+    res.json(user);
   } catch (error) {
-    res.status(401).json({ error: "Invalid Firebase Token" });
+    console.error('Get user error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

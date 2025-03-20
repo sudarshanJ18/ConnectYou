@@ -1,18 +1,19 @@
 const express = require('express');
-const router = express.Router();
 const Course = require('../models/Course');
 const auth = require('../middleware/auth');
+
+const router = express.Router();
 
 // Get all courses
 router.get('/', async (req, res) => {
   try {
     const { category, level, search } = req.query;
     let query = {};
-    
-    if (category && category !== 'All') {
+
+    if (category && category !== 'all') {
       query.category = category;
     }
-    if (level) {
+    if (level && level !== 'all') {
       query.level = level;
     }
     if (search) {
@@ -26,8 +27,8 @@ router.get('/', async (req, res) => {
       .populate('instructor', 'name email')
       .select('-content -quizzes');
     res.json(courses);
-  } catch (err) {
-    res.status(500).send('Server Error');
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -38,22 +39,22 @@ router.get('/:id', async (req, res) => {
       .populate('instructor', 'name email')
       .populate('enrolled.student', 'name email');
     if (!course) {
-      return res.status(404).json({ msg: 'Course not found' });
+      return res.status(404).json({ message: 'Course not found' });
     }
     res.json(course);
-  } catch (err) {
-    res.status(500).send('Server Error');
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
-// Create course (Alumni/Admin only)
+// Create course (protected route for Alumni/Admin only)
 router.post('/', auth, async (req, res) => {
   try {
     const { title, description, category, duration, level, content, thumbnail } = req.body;
-    
+
     // Verify user is alumni or admin
     if (!req.user.roles.includes('alumni') && !req.user.roles.includes('admin')) {
-      return res.status(403).json({ msg: 'Not authorized to create courses' });
+      return res.status(403).json({ message: 'Not authorized to create courses' });
     }
 
     const newCourse = new Course({
@@ -69,8 +70,8 @@ router.post('/', auth, async (req, res) => {
 
     const course = await newCourse.save();
     res.json(course);
-  } catch (err) {
-    res.status(500).send('Server Error');
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -79,12 +80,12 @@ router.post('/:id/enroll', auth, async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
     if (!course) {
-      return res.status(404).json({ msg: 'Course not found' });
+      return res.status(404).json({ message: 'Course not found' });
     }
 
     // Check if already enrolled
     if (course.enrolled.some(e => e.student.toString() === req.user.id)) {
-      return res.status(400).json({ msg: 'Already enrolled' });
+      return res.status(400).json({ message: 'Already enrolled' });
     }
 
     course.enrolled.push({
@@ -96,8 +97,8 @@ router.post('/:id/enroll', auth, async (req, res) => {
 
     await course.save();
     res.json(course);
-  } catch (err) {
-    res.status(500).send('Server Error');
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -106,10 +107,10 @@ router.put('/:id/progress', auth, async (req, res) => {
   try {
     const { contentId, completed, quizId, score } = req.body;
     const course = await Course.findById(req.params.id);
-    
+
     const enrollment = course.enrolled.find(e => e.student.toString() === req.user.id);
     if (!enrollment) {
-      return res.status(404).json({ msg: 'Not enrolled in this course' });
+      return res.status(404).json({ message: 'Not enrolled in this course' });
     }
 
     if (completed) {
@@ -126,8 +127,8 @@ router.put('/:id/progress', auth, async (req, res) => {
 
     await course.save();
     res.json(course);
-  } catch (err) {
-    res.status(500).send('Server Error');
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 

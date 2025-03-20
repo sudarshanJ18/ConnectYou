@@ -1,16 +1,29 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GraduationCap, UserSquare2, ArrowLeft, Loader2, BookOpen, Rocket, Trophy, Users } from 'lucide-react';
+import { GraduationCap, UserSquare2, ArrowLeft, Loader2, BookOpen, Rocket, Trophy, Users, Github, Linkedin, Facebook, Mail } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { auth } from './firebaseConfig';
+import { 
+  signInWithPopup, 
+  GoogleAuthProvider, 
+  GithubAuthProvider,
+  FacebookAuthProvider,
+  TwitterAuthProvider 
+} from 'firebase/auth';
+import { registerUser } from '../utils/api';
+
+const providers = {
+  google: new GoogleAuthProvider(),
+  github: new GithubAuthProvider(),
+  facebook: new FacebookAuthProvider(),
+  twitter: new TwitterAuthProvider()
+};
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: { 
     opacity: 1,
-    transition: { 
-      when: "beforeChildren",
-      staggerChildren: 0.1,
-      duration: 0.6
-    }
+    transition: { duration: 0.6 }
   },
   exit: {
     opacity: 0,
@@ -18,33 +31,8 @@ const containerVariants = {
   }
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: {
-      type: "spring",
-      stiffness: 300,
-      damping: 24
-    }
-  }
-};
-
-const buttonVariants = {
-  hover: { 
-    scale: 1.02,
-    transition: { duration: 0.2 }
-  },
-  tap: { scale: 0.98 },
-  initial: { scale: 1 }
-};
-
 const Features = () => (
-  <motion.div 
-    variants={itemVariants}
-    className="grid grid-cols-2 gap-4 mt-8"
-  >
+  <div className="grid grid-cols-2 gap-4 mt-8">
     <motion.div 
       whileHover={{ scale: 1.05 }}
       className="p-4 rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100"
@@ -80,10 +68,11 @@ const Features = () => (
       <h3 className="font-semibold text-orange-900">Build Network</h3>
       <p className="text-sm text-orange-700">Connect with alumni and mentors</p>
     </motion.div>
-  </motion.div>
+  </div>
 );
 
 const Signup = ({ togglePage }) => {
+  const navigate = useNavigate();
   const [userType, setUserType] = useState('');
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -116,6 +105,42 @@ const Signup = ({ togglePage }) => {
   ];
 
   const studyYears = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
+
+  const handleSocialSignup = async (providerName) => {
+    try {
+      setIsLoading(true);
+      const provider = providers[providerName];
+      const result = await signInWithPopup(auth, provider);
+      
+      // Extract user info from social login
+      const { user } = result;
+      const userData = {
+        email: user.email,
+        firstName: user.displayName?.split(' ')[0] || '',
+        lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
+        userType: userType,
+        socialProvider: providerName,
+        socialId: user.uid
+      };
+
+      // Register in your backend
+      const response = await registerUser(userData);
+      
+      if (response.token) {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('userType', userType);
+        navigate(userType === 'student' ? '/dashboard' : '/alumni-dashboard');
+      }
+    } catch (error) {
+      console.error('Social signup error:', error);
+      setErrors(prev => ({
+        ...prev,
+        submit: 'Social signup failed. Please try again.'
+      }));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -176,17 +201,23 @@ const Signup = ({ togglePage }) => {
     if (step === 2 && validateStep2()) {
       setIsLoading(true);
       try {
-        // Simulating API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        const userData = {
+          ...formData,
+          userType,
+        };
         
-        // Show success message
-        alert('Account created successfully! Please check your email to verify your account.');
+        const response = await registerUser(userData);
         
+        if (response.token) {
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('userType', userType);
+          navigate(userType === 'student' ? '/dashboard' : '/alumni-dashboard');
+        }
       } catch (error) {
         console.error('Error during signup:', error);
         setErrors(prev => ({
           ...prev,
-          submit: error.message
+          submit: error.response?.data?.message || 'Registration failed. Please try again.'
         }));
       } finally {
         setIsLoading(false);
@@ -195,10 +226,7 @@ const Signup = ({ togglePage }) => {
   };
 
   const FormField = ({ label, name, type = 'text', value, onChange, error, options = null }) => (
-    <motion.div 
-      variants={itemVariants}
-      className="relative"
-    >
+    <div className="relative">
       <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
       {options ? (
         <select
@@ -222,15 +250,11 @@ const Signup = ({ togglePage }) => {
         />
       )}
       {error && (
-        <motion.p
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="absolute -bottom-6 left-0 text-sm text-red-600"
-        >
+        <p className="absolute -bottom-6 left-0 text-sm text-red-600">
           {error}
-        </motion.p>
+        </p>
       )}
-    </motion.div>
+    </div>
   );
 
   if (!userType) {
@@ -243,19 +267,18 @@ const Signup = ({ togglePage }) => {
         className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4"
       >
         <div className="max-w-2xl w-full space-y-8 bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl">
-          <motion.div variants={itemVariants} className="text-center">
+          <div className="text-center">
             <h2 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               Welcome to ConnectYou
             </h2>
             <p className="mt-2 text-gray-600">Join our community of learners and achievers</p>
-          </motion.div>
+          </div>
           
           <div className="grid md:grid-cols-2 gap-8">
             <div className="space-y-6">
               <motion.button
-                variants={buttonVariants}
-                whileHover="hover"
-                whileTap="tap"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setUserType('student')}
                 className="w-full flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
               >
@@ -264,9 +287,8 @@ const Signup = ({ togglePage }) => {
               </motion.button>
 
               <motion.button
-                variants={buttonVariants}
-                whileHover="hover"
-                whileTap="tap"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setUserType('alumni')}
                 className="w-full flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
               >
@@ -274,7 +296,7 @@ const Signup = ({ togglePage }) => {
                 <span className="text-lg">Continue as Alumni</span>
               </motion.button>
 
-              <motion.div variants={itemVariants} className="text-center pt-4">
+              <div className="text-center pt-4">
                 <p className="text-gray-600">
                   Already have an account?{" "}
                   <button
@@ -284,7 +306,7 @@ const Signup = ({ togglePage }) => {
                     Sign in
                   </button>
                 </p>
-              </motion.div>
+              </div>
             </div>
 
             <Features />
@@ -303,33 +325,23 @@ const Signup = ({ togglePage }) => {
       className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4"
     >
       <div className="max-w-md w-full space-y-8 bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl">
-        <motion.div variants={itemVariants} className="text-center">
+        <div className="text-center">
           <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
             {userType === 'student' ? 'Student Signup' : 'Alumni Signup'}
           </h2>
           <div className="mt-4 flex justify-center space-x-3">
-            <motion.div 
+            <div 
               className={`h-2 w-16 rounded-full ${step === 1 ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : 'bg-gray-200'}`}
-              animate={{ scale: step === 1 ? 1.1 : 1 }}
-              transition={{ duration: 0.2 }}
             />
-            <motion.div 
+            <div 
               className={`h-2 w-16 rounded-full ${step === 2 ? 'bg-gradient-to-r from-purple-600 to-pink-600' : 'bg-gray-200'}`}
-              animate={{ scale: step === 2 ? 1.1 : 1 }}
-              transition={{ duration: 0.2 }}
             />
           </div>
-        </motion.div>
+        </div>
 
-        <AnimatePresence mode="wait">
-          {step === 1 && (
-            <motion.div
-              key="step1"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              className="space-y-6"
-            >
+        <div className="space-y-6">
+          {step === 1 ? (
+            <div className="space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <FormField
                   label="First Name"
@@ -378,108 +390,136 @@ const Signup = ({ togglePage }) => {
                 onChange={handleInputChange}
                 error={errors.phone}
               />
-            </motion.div>
-          )}
 
-          {step === 2 && userType === 'student' && (
-            <motion.div
-              key="step2-student"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              className="space-y-6"
-            >
-              <FormField
-                label="University Name"
-                name="university"
-                value={formData.university}
-                onChange={handleInputChange}
-                error={errors.university}
-              />
-              <FormField
-                label="Branch"
-                name="branch"
-                value={formData.branch}
-                onChange={handleInputChange}
-                error={errors.branch}
-                options={branches}
-              />
-              <FormField
-                label="Year of Study"
-                name="yearOfStudy"
-                value={formData.yearOfStudy}
-                onChange={handleInputChange}
-                error={errors.yearOfStudy}
-                options={studyYears}
-              />
-              <FormField
-                label="Student ID"
-                name="studentId"
-                value={formData.studentId}
-                onChange={handleInputChange}
-                error={errors.studentId}
-              />
-            </motion.div>
-          )}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">
+                    Or continue with
+                  </span>
+                </div>
+              </div>
 
-          {step === 2 && userType === 'alumni' && (
-            <motion.div
-              key="step2-alumni"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              className="space-y-6"
-            >
-              <FormField
-                label="Graduation Year"
-                name="graduationYear"
-                type="number"
-                value={formData.graduationYear}
-                onChange={handleInputChange}
-                error={errors.graduationYear}
-              />
-              <FormField
-                label="Current Company"
-                name="currentCompany"
-                value={formData.currentCompany}
-                onChange={handleInputChange}
-                error={errors.currentCompany}
-              />
-              <FormField
-                label="Job Title"
-                name="jobTitle"
-                value={formData.jobTitle}
-                onChange={handleInputChange}
-                error={errors.jobTitle}
-              />
-              <FormField
-                label="Industry"
-                name="industry"
-                value={formData.industry}
-                onChange={handleInputChange}
-                error={errors.industry}
-              />
-            </motion.div>
+              <div className="grid grid-cols-4 gap-4">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleSocialSignup('google')}
+                  className="flex justify-center items-center p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  <Mail className="w-5 h-5" />
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleSocialSignup('github')}
+                  className="flex justify-center items-center p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  <Github className="w-5 h-5" />
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleSocialSignup('facebook')}
+                  className="flex justify-center items-center p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  <Facebook className="w-5 h-5" />
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleSocialSignup('linkedin')}
+                  className="flex justify-center items-center p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  <Linkedin className="w-5 h-5" />
+                </motion.button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {userType === 'student' ? (
+                <>
+                  <FormField
+                    label="University Name"
+                    name="university"
+                    value={formData.university}
+                    onChange={handleInputChange}
+                    error={errors.university}
+                  />
+                  <FormField
+                    label="Branch"
+                    name="branch"
+                    value={formData.branch}
+                    onChange={handleInputChange}
+                    error={errors.branch}
+                    options={branches}
+                  />
+                  <FormField
+                    label="Year of Study"
+                    name="yearOfStudy"
+                    value={formData.yearOfStudy}
+                    onChange={handleInputChange}
+                    error={errors.yearOfStudy}
+                    options={studyYears}
+                  />
+                  <FormField
+                    label="Student ID"
+                    name="studentId"
+                    value={formData.studentId}
+                    onChange={handleInputChange}
+                    error={errors.studentId}
+                  />
+                </>
+              ) : (
+                <>
+                  <FormField
+                    label="Graduation Year"
+                    name="graduationYear"
+                    type="number"
+                    value={formData.graduationYear}
+                    onChange={handleInputChange}
+                    error={errors.graduationYear}
+                  />
+                  <FormField
+                    label="Current Company"
+                    name="currentCompany"
+                    value={formData.currentCompany}
+                    onChange={handleInputChange}
+                    error={errors.currentCompany}
+                  />
+                  <FormField
+                    label="Job Title"
+                    name="jobTitle"
+                    value={formData.jobTitle}
+                    onChange={handleInputChange}
+                    error={errors.jobTitle}
+                  />
+                  <FormField
+                    label="Industry"
+                    name="industry"
+                    value={formData.industry}
+                    onChange={handleInputChange}
+                    error={errors.industry}
+                  />
+                </>
+              )}
+            </div>
           )}
-        </AnimatePresence>
+        </div>
 
-        <motion.div variants={itemVariants} className="flex items-center justify-between pt-8">
+        <div className="flex items-center justify-between pt-8">
           {step === 2 && (
-            <motion.button
-              variants={buttonVariants}
-              whileHover="hover"
-              whileTap="tap"
+            <button
               onClick={() => setStep(1)}
               className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back
-            </motion.button>
+            </button>
           )}
-          <motion.button
-            variants={buttonVariants}
-            whileHover="hover"
-            whileTap="tap"
+          <button
             onClick={handleSubmit}
             disabled={isLoading}
             className={`flex items-center gap-2 px-6 py-3 ${step === 1 ? 'ml-auto' : ''} bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-1`}
@@ -488,20 +528,16 @@ const Signup = ({ togglePage }) => {
               <Loader2 className="w-5 h-5 animate-spin" />
             ) : null}
             {step === 2 ? "Create Account" : "Next Step"}
-          </motion.button>
-        </motion.div>
+          </button>
+        </div>
 
         {errors.submit && (
-          <motion.p
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-4 text-sm text-center text-red-600"
-          >
+          <p className="mt-4 text-sm text-center text-red-600">
             {errors.submit}
-          </motion.p>
+          </p>
         )}
 
-        <motion.div variants={itemVariants} className="mt-6 text-center">
+        <div className="mt-6 text-center">
           <p className="text-gray-600">
             Already have an account?{" "}
             <button
@@ -511,7 +547,7 @@ const Signup = ({ togglePage }) => {
               Sign in
             </button>
           </p>
-        </motion.div>
+        </div>
       </div>
     </motion.div>
   );

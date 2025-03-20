@@ -1,27 +1,35 @@
 const mongoose = require('mongoose');
 
+const lessonSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+  duration: { type: String, required: true },
+  videoUrl: String,
+  resources: [{ title: String, url: String, type: String }]
+});
+
+const moduleSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: String,
+  lessons: [lessonSchema]
+});
+
 const courseSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  description: {
-    type: String,
-    required: true
-  },
+  title: { type: String, required: true, trim: true },
+  description: { type: String, required: true },
   category: {
     type: String,
     required: true,
-    enum: ['Web Development', 'Data Science', 'Cloud Computing', 'Mobile Development', 'DevOps', 'Career Skills', 'Industry Insights', 'Personal Development']
+    enum: [
+      'Web Development', 'Data Science', 'Cloud Computing', 
+      'Mobile Development', 'DevOps', 'Career Skills', 
+      'Industry Insights', 'Personal Development', 'Design', 
+      'Business', 'Marketing', 'Personal'
+    ]
   },
   instructor: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
-  },
-  duration: {
-    type: String,
     required: true
   },
   level: {
@@ -29,69 +37,30 @@ const courseSchema = new mongoose.Schema({
     required: true,
     enum: ['Beginner', 'Intermediate', 'Advanced']
   },
-  content: [{
-    type: {
-      type: String,
-      enum: ['video', 'pdf', 'presentation', 'quiz'],
-      required: true
-    },
-    title: String,
-    url: String,
-    duration: Number,
-    order: Number
-  }],
-  quizzes: [{
-    title: String,
-    questions: [{
-      question: String,
-      options: [String],
-      correctAnswer: Number
-    }]
-  }],
+  duration: { type: String, required: true },
+  price: { type: Number, required: true },
+  rating: { type: Number, default: 0 },
+  enrolledCount: { type: Number, default: 0 },
   enrolled: [{
-    student: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
-    },
-    progress: Number,
+    student: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    progress: { type: Number, default: 0 },
     completedContent: [String],
-    quizScores: [{
-      quizId: String,
-      score: Number
-    }],
+    quizScores: [{ quizId: String, score: Number }],
     startDate: Date,
     lastAccessed: Date
   }],
-  rating: {
-    type: Number,
-    default: 0
-  },
   reviews: [{
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
-    },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     rating: Number,
     comment: String,
-    date: {
-      type: Date,
-      default: Date.now
-    }
+    date: { type: Date, default: Date.now }
   }],
   tags: [String],
   thumbnail: String,
-  isPublished: {
-    type: Boolean,
-    default: false
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  }
+  isPublished: { type: Boolean, default: false },
+  modules: [moduleSchema],
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 });
 
 courseSchema.pre('save', function(next) {
