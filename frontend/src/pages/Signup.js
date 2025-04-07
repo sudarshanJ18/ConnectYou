@@ -1,28 +1,8 @@
 
 import React, { useState, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  GraduationCap, 
-  UserSquare2, 
-  ArrowLeft, 
-  Loader2, 
-  BookOpen, 
-  Rocket, 
-  Trophy, 
-  Users, 
-  Github, 
-  Linkedin, 
-  Facebook, 
-  Mail 
-} from 'lucide-react';
+import {  GraduationCap, UserSquare2, ArrowLeft, Loader2, BookOpen, Rocket, Trophy, Users} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-const providers = {
-  google: null,
-  github: null,
-  facebook: null,
-  twitter: null
-};
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -255,43 +235,20 @@ const Signup = memo(({ togglePage }) => {
     return isValid;
   };
 
-  const handleSocialSignup = async (providerName) => {
-    try {
-      setIsLoading(true);
-      // Implement social signup logic here
-      console.log('Social signup with:', providerName);
-    } catch (error) {
-      setErrors(prev => ({
-        ...prev,
-        submit: error.message || 'Social signup failed. Please try again.'
-      }));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const formDataWithUserType = { ...formData, userType };
-
-    console.log('Form Data:', formDataWithUserType);
-    console.log("Handling submit...");
-    
-    if (!validateStep(step)) {
-      console.log("Step validation failed.");
-      return;
-    }
+  
+    if (!validateStep(step)) return;
   
     if (step === 1) {
-      console.log("Proceeding to next step...");
       setStep(2);
       return;
     }
   
     setIsLoading(true);
     try {
-      
       const response = await fetch('http://localhost:5000/api/users/register', {
         method: 'POST',
         headers: {
@@ -305,7 +262,8 @@ const Signup = memo(({ togglePage }) => {
       }
   
       console.log('Form submitted successfully');
-      navigate(userType === 'student' ? '/dashboard' : '/alumni');
+      window.alert('User registered successfully');
+      navigate('/login'); // 👈 redirecting to login page
     } catch (error) {
       setErrors(prev => ({ ...prev, submit: error.message || 'Registration failed. Please try again.' }));
       console.error('Error during submission:', error);
@@ -313,6 +271,7 @@ const Signup = memo(({ togglePage }) => {
       setIsLoading(false);
     }
   };
+  
 
   if (!userType) {
     return (
@@ -479,45 +438,6 @@ const Signup = memo(({ togglePage }) => {
                       Or continue with
                     </span>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-4 gap-4">
-                  <motion.button
-                    type="button"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleSocialSignup('google')}
-                    className="flex justify-center items-center p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                  >
-                    <Mail className="w-5 h-5" />
-                  </motion.button>
-                  <motion.button
-                    type="button"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleSocialSignup('github')}
-                    className="flex justify-center items-center p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                  >
-                    <Github className="w-5 h-5" />
-                  </motion.button>
-                  <motion.button
-                    type="button"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleSocialSignup('facebook')}
-                    className="flex justify-center items-center p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                  >
-                    <Facebook className="w-5 h-5" />
-                  </motion.button>
-                  <motion.button
-                    type="button"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleSocialSignup('linkedin')}
-                    className="flex justify-center items-center p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                  >
-                    <Linkedin className="w-5 h-5" />
-                  </motion.button>
                 </div>
               </motion.div>
             ) : (

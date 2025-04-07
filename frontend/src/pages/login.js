@@ -1,10 +1,11 @@
+// Login.tsx
+
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, Loader2, ArrowRight, Github, Linkedin, Facebook } from 'lucide-react';
+import { Mail, Lock, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { auth, googleProvider, facebookProvider } from './firebaseConfig';
-import { signInWithPopup, sendPasswordResetEmail } from 'firebase/auth';
-import { loginUser } from "../utils/api";
+import { auth } from './firebaseConfig';
+import { sendPasswordResetEmail } from 'firebase/auth';
 
 const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -44,7 +45,6 @@ const buttonVariants = {
     initial: { scale: 1 }
 };
 
-// Memoize the FormField component to prevent unnecessary re-renders
 const FormField = memo(({ label, name, type, value, error, touched, icon: Icon, onChange, onBlur }) => (
     <div className="relative mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
@@ -77,24 +77,17 @@ const FormField = memo(({ label, name, type, value, error, touched, icon: Icon, 
     </div>
 ));
 
-const Login = ({ togglePage }) => {
+const Login = () => {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        email: '',
-        password: ''
-    });
+    const [formData, setFormData] = useState({ email: '', password: '' });
     const [errors, setErrors] = useState({});
     const [touched, setTouched] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [showResetPassword, setShowResetPassword] = useState(false);
 
-    // Use useCallback to memoize these functions so they don't change on each render
     const handleInputChange = useCallback((e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        setFormData(prev => ({ ...prev, [name]: value }));
         setTouched(prev => ({ ...prev, [name]: true }));
     }, []);
 
@@ -123,7 +116,6 @@ const Login = ({ togglePage }) => {
         return Object.keys(newErrors).length === 0;
     }, [formData, errors]);
 
-    // Run validation when formData changes
     useEffect(() => {
         Object.keys(touched).forEach(field => {
             if (touched[field]) {
@@ -141,49 +133,51 @@ const Login = ({ togglePage }) => {
         return isValid;
     }, [validateField]);
 
-
     const BACKEND_URL = 'http://localhost:5000';
 
-const loginUser = async (userData) => {
-    const response = await fetch(`${BACKEND_URL}/api/users/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData)
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
-    }
-
-    return await response.json();
-};
-
-const handleSubmit = useCallback(async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
-    setIsLoading(true);
-    try {
-        const response = await loginUser(formData);
-
-        if (response.token) {
-            localStorage.setItem('token', response.token);
-            localStorage.setItem('userType', response.user.role);
-            localStorage.setItem('userName', response.user.name);
-
-            const redirectUrl = response.user.role === 'student' ? '/dashboard' : '/alumni';
-            navigate(redirectUrl);
-        }
-    } catch (error) {
-        setErrors({
-            submit: error.response?.data?.message || 'Login failed. Please try again.'
+    const loginUser = async (userData) => {
+        const response = await fetch(`${BACKEND_URL}/api/users/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
         });
-    } finally {
-        setIsLoading(false);
-    }
-}, [formData, validateForm, navigate]);
 
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Login failed');
+        }
+
+        return await response.json();
+    };
+
+    const handleSubmit = useCallback(async (e) => {
+        e.preventDefault();
+        if (!validateForm()) return;
+
+        setIsLoading(true);
+        try {
+            const response = await loginUser(formData);
+
+            if (response.token) {
+                const { token, user } = response;
+
+                localStorage.setItem('token', token);
+                localStorage.setItem('userId', user.id);
+                localStorage.setItem('userEmail', user.email);
+                localStorage.setItem('userType', user.role);
+                localStorage.setItem('userName', user.name);
+
+                const redirectUrl = user.role === 'student' ? '/dashboard' : '/alumni';
+                navigate(redirectUrl);
+            }
+        } catch (error) {
+            setErrors({
+                submit: error.message || 'Login failed. Please try again.'
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    }, [formData, validateForm, navigate]);
 
     const handleForgotPassword = useCallback(async () => {
         if (!formData.email) {
@@ -206,31 +200,6 @@ const handleSubmit = useCallback(async (e) => {
             setIsLoading(false);
         }
     }, [formData.email]);
-
-    const handleSocialLogin = useCallback(async (provider) => {
-        setIsLoading(true);
-        try {
-            const result = await signInWithPopup(auth, provider);
-            if (result.user) {
-                const userData = {
-                    email: result.user.email,
-                    socialId: result.user.uid,
-                    socialProvider: provider.providerId
-                };
-                const response = await loginUser(userData);
-                if (response.token) {
-                    localStorage.setItem('token', response.token);
-                    localStorage.setItem('userType', response.userType);
-                    
-                    navigate(response.userType === 'student' ? '/dashboard' : '/alumni-dashboard');
-                }
-            }
-        } catch (error) {
-            setErrors({ submit: 'Social login failed. Please try again.' });
-        } finally {
-            setIsLoading(false);
-        }
-    }, [navigate]);
 
     return (
         <motion.div
@@ -260,8 +229,7 @@ const handleSubmit = useCallback(async (e) => {
                         >
                             <div className="p-4 bg-green-50 rounded-lg border border-green-100">
                                 <p className="text-green-800">
-                                    Password reset link has been sent to {formData.email}.
-                                    Please check your inbox.
+                                    Password reset link has been sent to {formData.email}. Please check your inbox.
                                 </p>
                             </div>
                             <button
@@ -336,81 +304,25 @@ const handleSubmit = useCallback(async (e) => {
                                 disabled={isLoading}
                                 className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform"
                             >
-                                {isLoading ? (
-                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                ) : (
-                                    <>
-                                        Sign In
-                                        <ArrowRight className="w-5 h-5" />
-                                    </>
-                                )}
+                                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Sign In</>}
                             </motion.button>
 
-                            <div className="relative">
-                                <div className="absolute inset-0 flex items-center">
-                                    <div className="w-full border-t border-gray-300" />
-                                </div>
-                                <div className="relative flex justify-center text-sm">
-                                    <span className="px-2 bg-white text-gray-500">
-                                        Or continue with
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-3 gap-4">
-                                <motion.button
-                                    variants={buttonVariants}
-                                    whileHover="hover"
-                                    whileTap="tap"
+                            <div className="text-center text-sm text-gray-600 mt-4">
+                                Don’t have an account?{' '}
+                                <button
                                     type="button"
-                                    onClick={() => handleSocialLogin(googleProvider)}
-                                    disabled={isLoading}
-                                    className="flex justify-center items-center p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                                    onClick={() => navigate('/signup')}
+                                    className="text-indigo-600 hover:text-indigo-700 font-medium hover:underline transition-colors"
                                 >
-                                    <Github className="w-5 h-5" />
-                                </motion.button>
-                                <motion.button
-                                    variants={buttonVariants}
-                                    whileHover="hover"
-                                    whileTap="tap"
-                                    type="button"
-                                    onClick={() => handleSocialLogin(facebookProvider)}
-                                    disabled={isLoading}
-                                    className="flex justify-center items-center p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-                                >
-                                    <Facebook className="w-5 h-5" />
-                                </motion.button>
-                                <motion.button
-                                    variants={buttonVariants}
-                                    whileHover="hover"
-                                    whileTap="tap"
-                                    type="button"
-                                    disabled={isLoading}
-                                    className="flex justify-center items-center p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-                                >
-                                    <Linkedin className="w-5 h-5" />
-                                </motion.button>
+                                    Sign up
+                                </button>
                             </div>
                         </motion.form>
                     )}
                 </AnimatePresence>
-
-                <motion.div variants={itemVariants} className="text-center">
-                    <p className="text-gray-600">
-                        Don't have an account?{" "}
-                        <button
-                            onClick={togglePage}
-                            className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline transition-colors"
-                        >
-                            Sign up
-                        </button>
-                    </p>
-                </motion.div>
             </div>
         </motion.div>
     );
 };
 
 export default Login;
-
-
