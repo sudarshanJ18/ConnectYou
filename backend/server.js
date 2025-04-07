@@ -71,7 +71,7 @@ app.use(requestLogger);
 
 // Routes
 app.use("/api/profile", profileRoutes);
-app.use("/api/auth", authRoutes);
+// app.use("/api/auth", authRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/courses", coursesRoutes);

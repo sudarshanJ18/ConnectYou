@@ -1,16 +1,12 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const { getProfile, updateProfile } = require("../controllers/profileController");
-const authenticateUser = require("../middleware/auth");
+const { getProfile, updateProfile } = require('../controllers/profileController');
+const authenticate = require('../middleware/auth'); // A middleware to authenticate the user
 
-// @route   GET /api/profile/me
-// @desc    Get current user's profile
-// @access  Private
-router.get("/me", authenticateUser, getProfile);
+// Route to get the user profile
+router.get('/', authenticate, getProfile);
 
-// @route   PUT /api/profile
-// @desc    Update user profile
-// @access  Private
-router.put("/", authenticateUser, updateProfile);
+// Route to update the user profile
+router.put('/updateprofile', authenticate, updateProfile);
 
 module.exports = router;

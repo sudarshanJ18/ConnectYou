@@ -2,35 +2,15 @@ const Profile = require("../models/Profile");
 const User = require("../models/User");
 const { validateProfile } = require("../middleware/validators");
 
-// Get current user's profile
 const getProfile = async (req, res) => {
   try {
-    const userId = req.user.id; // Auth middleware sets req.user
+    const userId = req.user.user_id; // use UUID from JWT payload
 
-    const profile = await Profile.findOne({ user: userId }).populate("user", ["name", "email", "avatar"]);
+    console.log("User ID from token:", userId);
 
+    const profile = await Profile.findOne({ user: userId }).populate("user", ["firstName", "lastName", "email"]);
     if (!profile) {
-      // Create a default profile if not found
-      const user = await User.findById(userId);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      const defaultProfile = new Profile({
-        user: userId,
-        name: user.name || "New User",
-        email: user.email || "Not provided",
-        role: "Member",
-        location: "Not specified",
-        bio: "Tell us about yourself",
-        skills: [],
-        experience: [],
-        education: [],
-        social: { github: "", linkedin: "", twitter: "" }
-      });
-
-      await defaultProfile.save();
-      return res.status(201).json(defaultProfile);
+      return res.status(404).json({ message: "Profile not found" });
     }
 
     res.status(200).json(profile);
@@ -40,25 +20,23 @@ const getProfile = async (req, res) => {
   }
 };
 
-// Update user profile
 const updateProfile = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.user_id; // use UUID
 
-    // Validate request body
     const validationResult = validateProfile(req.body);
     if (!validationResult.success) {
       return res.status(400).json({ message: validationResult.errors });
     }
 
-    // Ensure skills is an array
     const updatedFields = {
       ...req.body,
-      skills: Array.isArray(req.body.skills) ? req.body.skills : req.body.skills?.split(",").map(skill => skill.trim()),
+      skills: Array.isArray(req.body.skills)
+        ? req.body.skills
+        : req.body.skills?.split(",").map(skill => skill.trim()),
       updatedAt: Date.now()
     };
 
-    // Find and update profile, or create if not found
     const updatedProfile = await Profile.findOneAndUpdate(
       { user: userId },
       { $set: updatedFields },

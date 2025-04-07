@@ -1,32 +1,39 @@
-import React, { useState } from 'react';
+
+import React, { useState, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GraduationCap, UserSquare2, ArrowLeft, Loader2, BookOpen, Rocket, Trophy, Users, Github, Linkedin, Facebook, Mail } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { auth } from './firebaseConfig';
 import { 
-  signInWithPopup, 
-  GoogleAuthProvider, 
-  GithubAuthProvider,
-  FacebookAuthProvider,
-  TwitterAuthProvider 
-} from 'firebase/auth';
-import { registerUser } from '../utils/api';
+  GraduationCap, 
+  UserSquare2, 
+  ArrowLeft, 
+  Loader2, 
+  BookOpen, 
+  Rocket, 
+  Trophy, 
+  Users, 
+  Github, 
+  Linkedin, 
+  Facebook, 
+  Mail 
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const providers = {
-  google: new GoogleAuthProvider(),
-  github: new GithubAuthProvider(),
-  facebook: new FacebookAuthProvider(),
-  twitter: new TwitterAuthProvider()
+  google: null,
+  github: null,
+  facebook: null,
+  twitter: null
 };
 
 const containerVariants = {
-  hidden: { opacity: 0 },
+  hidden: { opacity: 0, y: 20 },
   visible: { 
-    opacity: 1,
-    transition: { duration: 0.6 }
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.6, ease: 'easeOut' }
   },
   exit: {
     opacity: 0,
+    y: -20,
     transition: { duration: 0.3 }
   }
 };
@@ -71,7 +78,51 @@ const Features = () => (
   </div>
 );
 
-const Signup = ({ togglePage }) => {
+const FormField = memo(({ label, name, type = 'text', value, onChange, onBlur, error, options = null, touched }) => (
+  <div className="relative mb-6">
+    <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+    {options ? (
+      <select
+        name={name}
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur}
+        className={`w-full px-4 py-3 rounded-lg border ${
+          error && touched ? 'border-red-500' : 'border-gray-300'
+        } focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white`}
+      >
+        <option value="">Select {label}</option>
+        {options.map(option => (
+          <option key={option} value={option}>{option}</option>
+        ))}
+      </select>
+    ) : (
+      <input
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur}
+        className={`w-full px-4 py-3 rounded-lg border ${
+          error && touched ? 'border-red-500' : 'border-gray-300'
+        } focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200`}
+      />
+    )}
+    <AnimatePresence>
+      {error && touched && (
+        <motion.p
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="absolute -bottom-5 left-0 text-sm text-red-600"
+        >
+          {error}
+        </motion.p>
+      )}
+    </AnimatePresence>
+  </div>
+));
+const Signup = memo(({ togglePage }) => {
   const navigate = useNavigate();
   const [userType, setUserType] = useState('');
   const [step, setStep] = useState(1);
@@ -87,12 +138,9 @@ const Signup = ({ togglePage }) => {
     branch: '',
     yearOfStudy: '',
     studentId: '',
-    graduationYear: '',
-    currentCompany: '',
-    jobTitle: '',
-    industry: '',
   });
   const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
 
   const branches = [
     'Computer Science',
@@ -106,156 +154,165 @@ const Signup = ({ togglePage }) => {
 
   const studyYears = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
 
+  const handleBlur = useCallback((e) => {
+    const { name } = e.target;
+    setTouched(prev => ({ ...prev, [name]: true }));
+    validateField(name);
+  }, []);
+
+  const handleUserTypeChange = (type) => {
+    setUserType(type);
+    setFormData(prev => ({
+      firstName: '',        // Reset fields to their default state
+      lastName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      phone: '',
+      university: type === 'student' ? '' : prev.university,  // Retain university for alumni
+      branch: type === 'student' ? '' : prev.branch,          // Retain branch for alumni
+      yearOfStudy: type === 'student' ? '' : prev.yearOfStudy, // Retain year of study for alumni
+      studentId: type === 'student' ? '' : prev.studentId,     // Retain studentId for alumni
+    }));
+    setStep(1); // Optionally reset the step if needed
+  };
+
+  const handleInputChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    if (touched[name]) {
+      validateField(name);
+    }
+  }, [touched]);
+
+  const validateField = (name) => {
+    const newErrors = { ...errors };
+    switch (name) {
+      case 'firstName':
+      case 'lastName':
+        if (!formData[name]) newErrors[name] = `${name === 'firstName' ? 'First' : 'Last'} name is required`;
+        else delete newErrors[name];
+        break;
+      case 'email':
+        if (!formData.email) newErrors.email = 'Email is required';
+        else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Invalid email format';
+        else delete newErrors.email;
+        break;
+      case 'password':
+        if (!formData.password) newErrors.password = 'Password is required';
+        else if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
+        else delete newErrors.password;
+        break;
+      case 'confirmPassword':
+        if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
+        else delete newErrors.confirmPassword;
+        break;
+      case 'phone':
+        if (!formData.phone) newErrors.phone = 'Phone number is required';
+        else if (!/^\d{10}$/.test(formData.phone)) newErrors.phone = 'Invalid phone number format';
+        else delete newErrors.phone;
+        break;
+      default:
+        if (userType === 'student') {
+          if (['university', 'branch', 'yearOfStudy', 'studentId'].includes(name) && !formData[name]) {
+            newErrors[name] = `${name.charAt(0).toUpperCase() + name.slice(1)} is required`;
+          } else {
+            delete newErrors[name];
+          }
+        } else if (userType === 'alumni') {
+          if (['graduationYear', 'currentCompany', 'jobTitle', 'industry'].includes(name) && !formData[name]) {
+            newErrors[name] = `${name.charAt(0).toUpperCase() + name.slice(1)} is required`;
+          } else {
+            delete newErrors[name];
+          }
+        }
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep = (currentStep) => {
+    const fieldsToValidate = currentStep === 1 
+      ? ['firstName', 'lastName', 'email', 'password', 'confirmPassword', 'phone']
+      : userType === 'student'
+        ? ['university', 'branch', 'yearOfStudy', 'studentId']
+        : ['graduationYear', 'currentCompany', 'jobTitle', 'industry'];
+    
+    const newTouched = { ...touched };
+    fieldsToValidate.forEach(field => {
+      newTouched[field] = true;
+    });
+    setTouched(newTouched);
+    
+    let isValid = true;
+    fieldsToValidate.forEach(field => {
+      if (!validateField(field)) isValid = false;
+    });
+    return isValid;
+  };
+
   const handleSocialSignup = async (providerName) => {
     try {
       setIsLoading(true);
-      const provider = providers[providerName];
-      const result = await signInWithPopup(auth, provider);
-      
-      // Extract user info from social login
-      const { user } = result;
-      const userData = {
-        email: user.email,
-        firstName: user.displayName?.split(' ')[0] || '',
-        lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
-        userType: userType,
-        socialProvider: providerName,
-        socialId: user.uid
-      };
-
-      // Register in your backend
-      const response = await registerUser(userData);
-      
-      if (response.token) {
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('userType', userType);
-        navigate(userType === 'student' ? '/dashboard' : '/alumni-dashboard');
-      }
+      // Implement social signup logic here
+      console.log('Social signup with:', providerName);
     } catch (error) {
-      console.error('Social signup error:', error);
       setErrors(prev => ({
         ...prev,
-        submit: 'Social signup failed. Please try again.'
+        submit: error.message || 'Social signup failed. Please try again.'
       }));
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
-  const validateStep1 = () => {
-    const newErrors = {};
-    if (!formData.firstName) newErrors.firstName = 'First name is required';
-    if (!formData.lastName) newErrors.lastName = 'Last name is required';
-    if (!formData.email) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Invalid email format';
-    if (!formData.password) newErrors.password = 'Password is required';
-    else if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
-    if (!formData.phone) newErrors.phone = 'Phone number is required';
-    else if (!/^\d{10}$/.test(formData.phone)) newErrors.phone = 'Invalid phone number format';
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const validateStep2 = () => {
-    const newErrors = {};
-    if (userType === 'student') {
-      if (!formData.university) newErrors.university = 'University name is required';
-      if (!formData.branch) newErrors.branch = 'Branch is required';
-      if (!formData.yearOfStudy) newErrors.yearOfStudy = 'Year of study is required';
-      if (!formData.studentId) newErrors.studentId = 'Student ID is required';
-    } else {
-      if (!formData.graduationYear) newErrors.graduationYear = 'Graduation year is required';
-      if (!formData.currentCompany) newErrors.currentCompany = 'Current company is required';
-      if (!formData.jobTitle) newErrors.jobTitle = 'Job title is required';
-      if (!formData.industry) newErrors.industry = 'Industry is required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const formDataWithUserType = { ...formData, userType };
+
+    console.log('Form Data:', formDataWithUserType);
+    console.log("Handling submit...");
     
-    if (step === 1 && validateStep1()) {
+    if (!validateStep(step)) {
+      console.log("Step validation failed.");
+      return;
+    }
+  
+    if (step === 1) {
+      console.log("Proceeding to next step...");
       setStep(2);
       return;
     }
-
-    if (step === 2 && validateStep2()) {
-      setIsLoading(true);
-      try {
-        const userData = {
-          ...formData,
-          userType,
-        };
-        
-        const response = await registerUser(userData);
-        
-        if (response.token) {
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('userType', userType);
-          navigate(userType === 'student' ? '/dashboard' : '/alumni-dashboard');
-        }
-      } catch (error) {
-        console.error('Error during signup:', error);
-        setErrors(prev => ({
-          ...prev,
-          submit: error.response?.data?.message || 'Registration failed. Please try again.'
-        }));
-      } finally {
-        setIsLoading(false);
+  
+    setIsLoading(true);
+    try {
+      
+      const response = await fetch('http://localhost:5000/api/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formDataWithUserType)
+      });
+  
+      if (!response.ok) {
+        throw new Error('Registration failed. Please try again.');
       }
+  
+      console.log('Form submitted successfully');
+      navigate(userType === 'student' ? '/dashboard' : '/alumni');
+    } catch (error) {
+      setErrors(prev => ({ ...prev, submit: error.message || 'Registration failed. Please try again.' }));
+      console.error('Error during submission:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  const FormField = ({ label, name, type = 'text', value, onChange, error, options = null }) => (
-    <div className="relative">
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-      {options ? (
-        <select
-          name={name}
-          value={value}
-          onChange={onChange}
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white"
-        >
-          <option value="">Select {label}</option>
-          {options.map(option => (
-            <option key={option} value={option}>{option}</option>
-          ))}
-        </select>
-      ) : (
-        <input
-          type={type}
-          name={name}
-          value={value}
-          onChange={onChange}
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-        />
-      )}
-      {error && (
-        <p className="absolute -bottom-6 left-0 text-sm text-red-600">
-          {error}
-        </p>
-      )}
-    </div>
-  );
 
   if (!userType) {
     return (
@@ -275,26 +332,28 @@ const Signup = ({ togglePage }) => {
           </div>
           
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setUserType('student')}
-                className="w-full flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
-              >
-                <GraduationCap className="w-6 h-6" />
-                <span className="text-lg">Continue as Student</span>
-              </motion.button>
+  <div className="space-y-6">
+    <motion.button
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={() => handleUserTypeChange('student')}  // Using the handler
+      className="w-full flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+    >
+      <GraduationCap className="w-6 h-6" />
+      <span className="text-lg">Continue as Student</span>
+    </motion.button>
 
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setUserType('alumni')}
-                className="w-full flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
-              >
-                <UserSquare2 className="w-6 h-6" />
-                <span className="text-lg">Continue as Alumni</span>
-              </motion.button>
+    <motion.button
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={() => handleUserTypeChange('alumni')}  // Using the handler
+      className="w-full flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+    >
+      <UserSquare2 className="w-6 h-6" />
+      <span className="text-lg">Continue as Alumni</span>
+    </motion.button>
+  
+
 
               <div className="text-center pt-4">
                 <p className="text-gray-600">
@@ -324,7 +383,7 @@ const Signup = ({ togglePage }) => {
       variants={containerVariants}
       className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4"
     >
-      <div className="max-w-md w-full space-y-8 bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl">
+      <form onSubmit={handleSubmit} className="max-w-md w-full space-y-8 bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl">
         <div className="text-center">
           <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
             {userType === 'student' ? 'Student Signup' : 'Alumni Signup'}
@@ -340,178 +399,227 @@ const Signup = ({ togglePage }) => {
         </div>
 
         <div className="space-y-6">
-          {step === 1 ? (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-6">
+          <AnimatePresence mode="wait">
+            {step === 1 ? (
+              <motion.div
+                key="step1"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
+              >
+                <div className="grid grid-cols-2 gap-6">
+                  <FormField
+                    label="First Name"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    onBlur={handleBlur}
+                    error={errors.firstName}
+                    touched={touched.firstName}
+                  />
+                  <FormField
+                    label="Last Name"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    onBlur={handleBlur}
+                    error={errors.lastName}
+                    touched={touched.lastName}
+                  />
+                </div>
                 <FormField
-                  label="First Name"
-                  name="firstName"
-                  value={formData.firstName}
+                  label="Email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
                   onChange={handleInputChange}
-                  error={errors.firstName}
+                  onBlur={handleBlur}
+                  error={errors.email}
+                  touched={touched.email}
                 />
                 <FormField
-                  label="Last Name"
-                  name="lastName"
-                  value={formData.lastName}
+                  label="Password"
+                  name="password"
+                  type="password"
+                  value={formData.password}
                   onChange={handleInputChange}
-                  error={errors.lastName}
+                  onBlur={handleBlur}
+                  error={errors.password}
+                  touched={touched.password}
                 />
-              </div>
-              <FormField
-                label="Email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                error={errors.email}
-              />
-              <FormField
-                label="Password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                error={errors.password}
-              />
-              <FormField
-                label="Confirm Password"
-                name="confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-                error={errors.confirmPassword}
-              />
-              <FormField
-                label="Phone Number"
-                name="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={handleInputChange}
-                error={errors.phone}
-              />
+                <FormField
+                  label="Confirm Password"
+                  name="confirmPassword"
+                  type="password"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  onBlur={handleBlur}
+                  error={errors.confirmPassword}
+                  touched={touched.confirmPassword}
+                />
+                <FormField
+                  label="Phone Number"
+                  name="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  onBlur={handleBlur}
+                  error={errors.phone}
+                  touched={touched.phone}
+                />
 
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300" />
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-300" />
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-white text-gray-500">
+                      Or continue with
+                    </span>
+                  </div>
                 </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">
-                    Or continue with
-                  </span>
-                </div>
-              </div>
 
-              <div className="grid grid-cols-4 gap-4">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleSocialSignup('google')}
-                  className="flex justify-center items-center p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  <Mail className="w-5 h-5" />
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleSocialSignup('github')}
-                  className="flex justify-center items-center p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  <Github className="w-5 h-5" />
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleSocialSignup('facebook')}
-                  className="flex justify-center items-center p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  <Facebook className="w-5 h-5" />
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleSocialSignup('linkedin')}
-                  className="flex justify-center items-center p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  <Linkedin className="w-5 h-5" />
-                </motion.button>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {userType === 'student' ? (
-                <>
-                  <FormField
-                    label="University Name"
-                    name="university"
-                    value={formData.university}
-                    onChange={handleInputChange}
-                    error={errors.university}
-                  />
-                  <FormField
-                    label="Branch"
-                    name="branch"
-                    value={formData.branch}
-                    onChange={handleInputChange}
-                    error={errors.branch}
-                    options={branches}
-                  />
-                  <FormField
-                    label="Year of Study"
-                    name="yearOfStudy"
-                    value={formData.yearOfStudy}
-                    onChange={handleInputChange}
-                    error={errors.yearOfStudy}
-                    options={studyYears}
-                  />
-                  <FormField
-                    label="Student ID"
-                    name="studentId"
-                    value={formData.studentId}
-                    onChange={handleInputChange}
-                    error={errors.studentId}
-                  />
-                </>
-              ) : (
-                <>
-                  <FormField
-                    label="Graduation Year"
-                    name="graduationYear"
-                    type="number"
-                    value={formData.graduationYear}
-                    onChange={handleInputChange}
-                    error={errors.graduationYear}
-                  />
-                  <FormField
-                    label="Current Company"
-                    name="currentCompany"
-                    value={formData.currentCompany}
-                    onChange={handleInputChange}
-                    error={errors.currentCompany}
-                  />
-                  <FormField
-                    label="Job Title"
-                    name="jobTitle"
-                    value={formData.jobTitle}
-                    onChange={handleInputChange}
-                    error={errors.jobTitle}
-                  />
-                  <FormField
-                    label="Industry"
-                    name="industry"
-                    value={formData.industry}
-                    onChange={handleInputChange}
-                    error={errors.industry}
-                  />
-                </>
-              )}
-            </div>
-          )}
+                <div className="grid grid-cols-4 gap-4">
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleSocialSignup('google')}
+                    className="flex justify-center items-center p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  >
+                    <Mail className="w-5 h-5" />
+                  </motion.button>
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleSocialSignup('github')}
+                    className="flex justify-center items-center p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  >
+                    <Github className="w-5 h-5" />
+                  </motion.button>
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleSocialSignup('facebook')}
+                    className="flex justify-center items-center p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  >
+                    <Facebook className="w-5 h-5" />
+                  </motion.button>
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleSocialSignup('linkedin')}
+                    className="flex justify-center items-center p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  >
+                    <Linkedin className="w-5 h-5" />
+                  </motion.button>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="step2"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
+              >
+                {userType === 'student' ? (
+                  <>
+                    <FormField
+                      label="University Name"
+                      name="university"
+                      value={formData.university}
+                      onChange={handleInputChange}
+                      onBlur={handleBlur}
+                      error={errors.university}
+                      touched={touched.university}
+                    />
+                    <FormField
+                      label="Branch"
+                      name="branch"
+                      value={formData.branch}
+                      onChange={handleInputChange}
+                      onBlur={handleBlur}
+                      error={errors.branch}
+                      touched={touched.branch}
+                      options={branches}
+                    />
+                    <FormField
+                      label="Year of Study"
+                      name="yearOfStudy"
+                      value={formData.yearOfStudy}
+                      onChange={handleInputChange}
+                      onBlur={handleBlur}
+                      error={errors.yearOfStudy}
+                      touched={touched.yearOfStudy}
+                      options={studyYears}
+                    />
+                    <FormField
+                      label="Student ID"
+                      name="studentId"
+                      value={formData.studentId}
+                      onChange={handleInputChange}
+                      onBlur={handleBlur}
+                      error={errors.studentId}
+                      touched={touched.studentId}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <FormField
+                      label="Graduation Year"
+                      name="graduationYear"
+                      type="number"
+                      value={formData.graduationYear}
+                      onChange={handleInputChange}
+                      onBlur={handleBlur}
+                      error={errors.graduationYear}
+                      touched={touched.graduationYear}
+                    />
+                    <FormField
+                      label="Current Company"
+                      name="currentCompany"
+                      value={formData.currentCompany}
+                      onChange={handleInputChange}
+                      onBlur={handleBlur}
+                      error={errors.currentCompany}
+                      touched={touched.currentCompany}
+                    />
+                    <FormField
+                      label="Job Title"
+                      name="jobTitle"
+                      value={formData.jobTitle}
+                      onChange={handleInputChange}
+                      onBlur={handleBlur}
+                      error={errors.jobTitle}
+                      touched={touched.jobTitle}
+                    />
+                    <FormField
+                      label="Industry"
+                      name="industry"
+                      value={formData.industry}
+                      onChange={handleInputChange}
+                      onBlur={handleBlur}
+                      error={errors.industry}
+                      touched={touched.industry}
+                    />
+                  </>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        <div className="flex items-center justify-between pt-8">
+        <div className="flex items-center justify-between pt-4">
           {step === 2 && (
             <button
+              type="button"
               onClick={() => setStep(1)}
               className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 transition-colors"
             >
@@ -520,27 +628,33 @@ const Signup = ({ togglePage }) => {
             </button>
           )}
           <button
-            onClick={handleSubmit}
+            type="submit"
             disabled={isLoading}
             className={`flex items-center gap-2 px-6 py-3 ${step === 1 ? 'ml-auto' : ''} bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-1`}
           >
-            {isLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : null}
+            {isLoading && <Loader2 className="w-5 h-5 animate-spin" />}
             {step === 2 ? "Create Account" : "Next Step"}
           </button>
         </div>
 
-        {errors.submit && (
-          <p className="mt-4 text-sm text-center text-red-600">
-            {errors.submit}
-          </p>
-        )}
+        <AnimatePresence>
+          {errors.submit && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="mt-4 text-sm text-center text-red-600"
+            >
+              {errors.submit}
+            </motion.p>
+          )}
+        </AnimatePresence>
 
         <div className="mt-6 text-center">
           <p className="text-gray-600">
             Already have an account?{" "}
             <button
+              type="button"
               onClick={togglePage}
               className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline transition-colors"
             >
@@ -548,9 +662,9 @@ const Signup = ({ togglePage }) => {
             </button>
           </p>
         </div>
-      </div>
+      </form>
     </motion.div>
   );
-};
+});
 
 export default Signup;

@@ -1,30 +1,115 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const { User, Student, Alumni } = require('../models/User');
 const auth = require('../middleware/auth');
+const validator = require('validator');
+
 
 const router = express.Router();
 
 // Register user
+
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, name } = req.body;
-    
+    let {
+      firstName,
+      lastName,
+      email,
+      password,
+      phone,
+      userType,
+      university,
+      branch,
+      yearOfStudy,
+      studentId,
+      currentCompany,
+      jobTitle,
+      industry,
+      graduationYear 
+    } = req.body;
+
+    // Input sanitization
+    firstName = validator.escape(firstName?.trim());
+    lastName = validator.escape(lastName?.trim());
+    email = validator.normalizeEmail(email?.trim());
+    phone = phone?.trim();
+
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ message: 'Invalid email format' });
+    }
+
+    if (phone && !validator.isMobilePhone(phone, 'en-IN')) {
+      return res.status(400).json({ message: 'Invalid phone number' });
+    }
+
+    if (!validator.isStrongPassword(password)) {
+      return res.status(400).json({ message: 'Password is not strong enough' });
+    }
+
+    // Check if the user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    const user = new User({
+    // Validate userType
+    if (!['student', 'alumni'].includes(userType)) {
+      return res.status(400).json({ message: 'Invalid userType. Must be student or alumni.' });
+    }
+
+    // Validate alumni specific fields
+    if (userType === 'alumni') {
+      if (!graduationYear) {
+        return res.status(400).json({ message: 'Graduation year is required for alumni.' });
+      }
+      if (!currentCompany || !jobTitle || !industry) {
+        return res.status(400).json({ message: 'Missing required alumni fields.' });
+      }
+    }
+
+    // Prepare user data based on userType
+    const userData = {
+      firstName,
+      lastName,
       email,
       password,
-      name
-    });
+      phone,
+      userType,
+      role: userType === 'student' ? 'student' : 'instructor'
+    };
+
+    if (userType === 'student') {
+      if (!university || !branch || !yearOfStudy || !studentId) {
+        return res.status(400).json({ message: 'Missing required student fields.' });
+      }
+      Object.assign(userData, {
+        university: validator.escape(university.trim()),
+        branch,
+        yearOfStudy,
+        studentId: validator.escape(studentId.trim())
+      });
+    } else if (userType === 'alumni') {
+      Object.assign(userData, {
+        graduationYear,
+        currentCompany: validator.escape(currentCompany.trim()),
+        jobTitle: validator.escape(jobTitle.trim()),
+        industry: validator.escape(industry.trim())
+      });
+    }
+
+    // Create and save the user based on userType
+    let user;
+    if (userType === 'student') {
+      user = new Student(userData);
+    } else if (userType === 'alumni') {
+      user = new Alumni(userData);
+    }
 
     await user.save();
 
+    // Generate JWT token
     const token = jwt.sign(
-      { userId: user._id },
+      { userId: user._id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -33,62 +118,90 @@ router.post('/register', async (req, res) => {
       token,
       user: {
         id: user._id,
-        name: user.name,
+        user_id: user.user_id, // Include this line
+        firstName: user.firstName,
+        lastName: user.lastName,
         email: user.email,
         role: user.role
       }
     });
+    
+
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ message: error.message });
   }
 });
 
-// Login user
-router.post('/login', async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    
-    const user = await User.findOne({ email });
+
+    // Find the user and include the password field
+    const user = await User.findOne({ email }).select("+password");
     if (!user) {
-      return res.status(400).json({ message: 'User not found' });
+      return res.status(400).json({ message: "User not found" });
     }
 
+    // Ensure comparePassword method exists
+    if (typeof user.comparePassword !== 'function') {
+      return res.status(500).json({ message: "Password comparison method not available" });
+    }
+
+    // Validate password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    // Generate JWT
     const token = jwt.sign(
-      { userId: user._id },
+      { userId: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: "24h" }
     );
+
+    const redirectUrl = user.userType === "student" ? "/dashboard" : "/alumni";
 
     res.json({
       token,
+      redirectUrl,
       user: {
         id: user._id,
-        name: user.name,
+        user_id: user.user_id, // custom user_id
+        name: `${user.firstName} ${user.lastName}`,
         email: user.email,
-        role: user.role
+        role: user.role,
+        userType: user.userType
       }
     });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ message: error.message });
   }
 });
+
+
 
 // Get user profile
 router.get('/profile', auth, async (req, res) => {
   try {
+    // Find the user and populate the associated profile
     const user = await User.findById(req.user.userId)
-      .select('-password')
-      .populate('enrolledCourses.course');
+      .select('-password') // Don't send the password
+      .populate('profile'); // Populate the associated profile data
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Send the user data along with profile details
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
+
 
 // Enroll in course
 router.post('/enroll/:courseId', auth, async (req, res) => {

@@ -46,15 +46,15 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
-// Create course (protected route for Alumni/Admin only)
 router.post('/', auth, async (req, res) => {
   try {
-    const { title, description, category, duration, level, content, thumbnail } = req.body;
+    const {
+      title, description, category, duration,
+      level, content, thumbnail, price
+    } = req.body;
 
-    // Verify user is alumni or admin
-    if (!req.user.roles.includes('alumni') && !req.user.roles.includes('admin')) {
-      return res.status(403).json({ message: 'Not authorized to create courses' });
+    if (!req.user || !["instructor", "admin"].includes(req.user.role)) {
+      return res.status(403).json({ message: "Unauthorized access: Only instructors or admins allowed" });
     }
 
     const newCourse = new Course({
@@ -65,7 +65,8 @@ router.post('/', auth, async (req, res) => {
       duration,
       level,
       content,
-      thumbnail
+      thumbnail,
+      price // ✅ this was missing
     });
 
     const course = await newCourse.save();
@@ -74,6 +75,7 @@ router.post('/', auth, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
 
 // Enroll in course
 router.post('/:id/enroll', auth, async (req, res) => {
@@ -102,30 +104,40 @@ router.post('/:id/enroll', auth, async (req, res) => {
   }
 });
 
-// Update course progress
 router.put('/:id/progress', auth, async (req, res) => {
   try {
-    const { contentId, completed, quizId, score } = req.body;
-    const course = await Course.findById(req.params.id);
+    console.log("Request Body:", req.body);
+    console.log("Authenticated User:", req.user);
 
-    const enrollment = course.enrolled.find(e => e.student.toString() === req.user.id);
+    const course = await Course.findById(req.params.id);
+    if (!course) return res.status(404).json({ message: 'Course not found' });
+
+    console.log("Course Enrollments:", course.enrolled.map(e => e.student.toString()));
+
+    const enrollment = course.enrolled.find(
+      e => e.student.toString() === req.user.id.toString()
+    );
+
     if (!enrollment) {
       return res.status(404).json({ message: 'Not enrolled in this course' });
     }
 
-    if (completed) {
+    const { contentId, completed, quizId, score } = req.body;
+
+    if (completed && contentId && !enrollment.completedContent.includes(contentId)) {
       enrollment.completedContent.push(contentId);
     }
+
     if (quizId) {
       enrollment.quizScores.push({ quizId, score });
     }
 
-    // Calculate progress
-    const totalContent = course.content.length;
-    enrollment.progress = (enrollment.completedContent.length / totalContent) * 100;
-    enrollment.lastAccessed = Date.now();
+    const totalLessons = course.modules.reduce((total, mod) => total + mod.lessons.length, 0);
+    enrollment.progress = (enrollment.completedContent.length / totalLessons) * 100;
+    enrollment.lastAccessed = new Date();
 
     await course.save();
+
     res.json(course);
   } catch (error) {
     res.status(500).json({ message: error.message });

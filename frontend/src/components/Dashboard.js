@@ -20,6 +20,11 @@ import MentorPage from "../pages/Dashboard/MentorPage";
 import MessagesPage from "../pages/Dashboard/MessagesPage";
 import OpenProjectsPage from "../pages/Dashboard/OpenProjectsPage";
 import WorkshopsPage from "../pages/Dashboard/WorkshopsPage";
+import ProfilePage from "../pages/Dashboard/ProfilePage";
+import StudentProfilePage from "../pages/Dashboard/StudentProfilePage";
+
+import { useNavigate } from 'react-router-dom';
+
 
 // Dashboard Content Component
 const DashboardContent = () => {
@@ -28,6 +33,8 @@ const DashboardContent = () => {
     { id: 2, text: 'Upcoming workshop: Advanced React', type: 'info' },
     { id: 3, text: 'Career fair next week', type: 'warning' }
   ];
+
+  
 
   const featuredServices = [
     {
@@ -218,68 +225,68 @@ const DashboardContent = () => {
 };
 
 // Profile Page Component
-const ProfilePage = () => {
-  const userProfile = {
-    name: "Alex Johnson",
-    role: "Software Developer",
-    email: "alex.j@example.com",
-    location: "San Francisco, CA",
-    skills: ["React", "Node.js", "Python", "AWS"],
-    education: "MS Computer Science",
-    interests: ["AI/ML", "Web Development", "Cloud Architecture"]
-  };
+// const ProfilePage = () => {
+//   const userProfile = {
+//     name: "Alex Johnson",
+//     role: "Software Developer",
+//     email: "alex.j@example.com",
+//     location: "San Francisco, CA",
+//     skills: ["React", "Node.js", "Python", "AWS"],
+//     education: "MS Computer Science",
+//     interests: ["AI/ML", "Web Development", "Cloud Architecture"]
+//   };
 
-  return (
-    <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <div className="flex items-center mb-6">
-          <div className="w-24 h-24 bg-purple-200 rounded-full flex items-center justify-center">
-            <User className="w-12 h-12 text-purple-600" />
-          </div>
-          <div className="ml-6">
-            <h2 className="text-2xl font-bold">{userProfile.name}</h2>
-            <p className="text-gray-600">{userProfile.role}</p>
-            <p className="text-gray-500">{userProfile.location}</p>
-          </div>
-        </div>
+//   return (
+//     <div className="max-w-4xl mx-auto">
+//       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+//         <div className="flex items-center mb-6">
+//           <div className="w-24 h-24 bg-purple-200 rounded-full flex items-center justify-center">
+//             <User className="w-12 h-12 text-purple-600" />
+//           </div>
+//           <div className="ml-6">
+//             <h2 className="text-2xl font-bold">{userProfile.name}</h2>
+//             <p className="text-gray-600">{userProfile.role}</p>
+//             <p className="text-gray-500">{userProfile.location}</p>
+//           </div>
+//         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="text-lg font-semibold mb-3">Contact Information</h3>
-            <p className="text-gray-600 mb-2">Email: {userProfile.email}</p>
-          </div>
+//         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//           <div>
+//             <h3 className="text-lg font-semibold mb-3">Contact Information</h3>
+//             <p className="text-gray-600 mb-2">Email: {userProfile.email}</p>
+//           </div>
           
-          <div>
-            <h3 className="text-lg font-semibold mb-3">Education</h3>
-            <p className="text-gray-600">{userProfile.education}</p>
-          </div>
-        </div>
+//           <div>
+//             <h3 className="text-lg font-semibold mb-3">Education</h3>
+//             <p className="text-gray-600">{userProfile.education}</p>
+//           </div>
+//         </div>
 
-        <div className="mt-6">
-          <h3 className="text-lg font-semibold mb-3">Skills</h3>
-          <div className="flex flex-wrap gap-2">
-            {userProfile.skills.map(skill => (
-              <span key={skill} className="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-sm">
-                {skill}
-              </span>
-            ))}
-          </div>
-        </div>
+//         <div className="mt-6">
+//           <h3 className="text-lg font-semibold mb-3">Skills</h3>
+//           <div className="flex flex-wrap gap-2">
+//             {userProfile.skills.map(skill => (
+//               <span key={skill} className="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-sm">
+//                 {skill}
+//               </span>
+//             ))}
+//           </div>
+//         </div>
 
-        <div className="mt-6">
-          <h3 className="text-lg font-semibold mb-3">Interests</h3>
-          <div className="flex flex-wrap gap-2">
-            {userProfile.interests.map(interest => (
-              <span key={interest} className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">
-                {interest}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+//         <div className="mt-6">
+//           <h3 className="text-lg font-semibold mb-3">Interests</h3>
+//           <div className="flex flex-wrap gap-2">
+//             {userProfile.interests.map(interest => (
+//               <span key={interest} className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">
+//                 {interest}
+//               </span>
+//             ))}
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
 
 // Events Page Component
 const EventsPage = () => {
@@ -331,12 +338,21 @@ const EventsPage = () => {
 const Dashboard = () => {
   const [activeMenuItem, setActiveMenuItem] = useState("Dashboard");
   const [isLoading, setIsLoading] = useState(true);
-
+  const [userName, setUserName] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const storedName = localStorage.getItem('userName');
+    if (storedName) {
+      setUserName(storedName);
+    }
+    
+    
     const timer = setTimeout(() => setIsLoading(false), 1000);
+    
     return () => clearTimeout(timer);
   }, []);
+  
 
   const menuItems = [
     { name: "Dashboard", icon: <LineChart className="w-4 h-4" />, path: "/" },
@@ -392,17 +408,22 @@ const Dashboard = () => {
         {/* Header */}
         <header className="bg-white shadow-sm sticky top-0 z-10">
           <div className="flex items-center justify-between px-6 py-4">
-            <h2 className="text-xl font-semibold text-gray-800">Welcome back, Alex!</h2>
+            <h2 className="text-xl font-semibold text-gray-800">Welcome back, {userName}</h2>
             <div className="flex items-center space-x-4">
               <button className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200">
                 <Bell className="h-5 w-5" />
               </button>
-              <button className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200">
-                <User className="h-5 w-5" />
-              </button>
-              <button className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200">
-                <LogOut className="h-5 w-5" />
-              </button>
+              <button
+  className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
+  onClick={() => navigate('/profile')}
+>
+  <User className="h-5 w-5" />
+</button>
+              <button
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
+                onClick={() => navigate('/login')}
+><LogOut className="h-5 w-5" />
+</button>
             </div>
           </div>
         </header>
@@ -420,6 +441,8 @@ const Dashboard = () => {
               <Route path="/ai-assistant" element={<AIAssistantPage />} />
               <Route path="/workshops" element={<WorkshopsPage />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/studentprofile" element={<StudentProfilePage />} />
+              
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </main>
