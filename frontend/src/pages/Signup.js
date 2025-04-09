@@ -318,7 +318,8 @@ const Signup = memo(({ togglePage }) => {
                 <p className="text-gray-600">
                   Already have an account?{" "}
                   <button
-                    onClick={togglePage}
+                    type="button"
+                    onClick={() => navigate('/login')}
                     className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline transition-colors"
                   >
                     Sign in

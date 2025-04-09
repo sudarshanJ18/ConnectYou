@@ -214,27 +214,28 @@ const ELearningPage = () => {
     { id: 'intermediate', label: 'Intermediate' },
     { id: 'advanced', label: 'Advanced' }
   ];
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
   
         // Fetching courses
-        const coursesResponse = await fetch('https://courses.edx.org/api/courses/v1/courses/');
+        const coursesResponse = await fetch('http://localhost:5000/api/courses/');
         if (!coursesResponse.ok) {
           throw new Error('Failed to fetch courses');
         }
         const coursesData = await coursesResponse.json();
-        setCourses(coursesData.results);
+        console.log("Fetched courses data:", coursesData);
+        setCourses(coursesData); // assuming API returns array directly
   
         // Fetching course recommendations
-        const recommendationsResponse = await fetch('https://courses.edx.org/api/edx_recommendations/learner_dashboard/course_recommendations/');
+        const recommendationsResponse = await fetch('http://localhost:5000/api/courses/');
         if (!recommendationsResponse.ok) {
           throw new Error('Failed to fetch recommendations');
         }
         const recommendationsData = await recommendationsResponse.json();
-        setRecommendedCourses(recommendationsData.results);
+        console.log("Fetched recommendations:", recommendationsData);
+        setRecommendedCourses(recommendationsData); // assuming API returns array directly
       } catch (error) {
         console.error('Error fetching courses:', error);
       } finally {
@@ -244,6 +245,7 @@ const ELearningPage = () => {
   
     fetchData();
   }, [selectedCategory, selectedLevel, searchTerm]);
+  
   const handleEnroll = async (courseId) => {
     try {
       const response = await fetch(`/api/courses/${courseId}/enroll`, {
@@ -252,16 +254,16 @@ const ELearningPage = () => {
           'Content-Type': 'application/json'
         }
       });
-
+  
       if (!response.ok) throw new Error('Failed to enroll');
-
+  
       const updatedCourse = await response.json();
       setSelectedCourse(updatedCourse);
     } catch (error) {
       console.error('Error enrolling in course:', error);
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}

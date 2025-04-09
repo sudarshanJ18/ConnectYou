@@ -5,6 +5,9 @@ const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const morgan = require("morgan");
+const http = require("http"); // ✅ Added for HTTP server
+const chatRoutes = require('./routes/chatRoutes');
+const chatSocket = require('./socket/socket');
 
 dotenv.config();
 
@@ -23,9 +26,8 @@ if (missingEnvVars.length > 0) {
 
 // Import all routes
 const profileRoutes = require('./routes/profile');
-const authRoutes = require('./routes/auth');
+// const authRoutes = require('./routes/auth');
 const aiRoutes = require('./routes/ai');
-const chatRoutes = require('./routes/chat');
 const coursesRoutes = require('./routes/courses');
 const mentorRoutes = require('./routes/mentor');
 const usersRoutes = require('./routes/users');
@@ -60,6 +62,17 @@ app.use(cors({
     credentials: true
 }));
 
+// Create HTTP server
+const server = http.createServer(app);
+
+// Initialize Socket.io
+const io = require('socket.io')(server, {
+    cors: {
+        origin: '*',
+        methods: ['GET', 'POST']
+    }
+});
+
 // Log all incoming requests for debugging
 app.use((req, res, next) => {
     console.log(`[${req.method}] ${req.url} - Headers:`, req.headers);
@@ -73,10 +86,10 @@ app.use(requestLogger);
 app.use("/api/profile", profileRoutes);
 // app.use("/api/auth", authRoutes);
 app.use("/api/ai", aiRoutes);
-app.use("/api/chat", chatRoutes);
 app.use("/api/courses", coursesRoutes);
 app.use("/api/mentor", mentorRoutes);
 app.use("/api/users", usersRoutes);
+app.use('/api/chats', chatRoutes);
 
 // Health check endpoint
 app.get("/health", (req, res) => {
@@ -136,8 +149,9 @@ process.on('unhandledRejection', (err) => {
     }
 });
 
+// Start server
 const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`
 🚀 Server is running
 📍 PORT: ${PORT}
@@ -147,5 +161,6 @@ const server = app.listen(PORT, () => {
 });
 
 connectDB();
+chatSocket(io);
 
 module.exports = { app, server };
