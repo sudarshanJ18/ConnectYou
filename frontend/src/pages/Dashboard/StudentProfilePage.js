@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { User, Github as GitHub, Linkedin, Twitter, MapPin, Edit2, Save } from 'lucide-react';
 import { getProfile, updateProfile } from "../../utils/api"; // API utility to handle backend calls
+import DashboardNavbar from './StudentNavbar';
 
 const StudentProfilePage = () => {
   const [profile, setProfile] = useState(null);
@@ -74,6 +75,7 @@ const StudentProfilePage = () => {
 
   return (
     <motion.div className="max-w-4xl mx-auto py-8 px-4">
+      <DashboardNavbar />
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="relative h-32 bg-gradient-to-r from-purple-500 to-blue-500">
           {isEditing && (
