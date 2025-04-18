@@ -1,38 +1,63 @@
 const express = require("express");
-const Mentor = require("../models/Mentor");
 const router = express.Router();
+const multer = require("multer");
+const path = require("path");
+const Mentor = require("../models/mentor");
 
-// ✅ Get all mentors
+// Setup multer for file upload
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage });
+
+// POST route to create a mentor
+router.post("/", upload.single("image"), async (req, res) => {
+  try {
+    console.log("Request body:", req.body);
+    console.log("File uploaded:", req.file);
+
+    const { name, role, company, expertise, rating, availability, sessions } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({ error: "Image file is required." });
+    }
+
+    const newMentor = new Mentor({
+      name,
+      role,
+      company,
+      expertise: expertise.split(","),
+      rating,
+      availability,
+      sessions: sessions || 0,
+      image: req.file.path
+    });
+
+    await newMentor.save();
+    res.status(201).json({ message: "Mentor created successfully", mentor: newMentor });
+  } catch (err) {
+    console.error("❌ Error creating mentor:", err);
+    res.status(400).json({
+      error: "Invalid data",
+      details: err.message
+    });
+  }
+});
+
+// ✅ GET route to fetch all mentors
 router.get("/", async (req, res) => {
   try {
     const mentors = await Mentor.find();
-    res.json(mentors);
-  } catch (error) {
-    res.status(500).json({ error: "Server Error" });
-  }
-});
-
-// ✅ Add a new mentor
-router.post("/", async (req, res) => {
-  try {
-    const newMentor = new Mentor(req.body);
-    await newMentor.save();
-    res.status(201).json(newMentor);
-  } catch (error) {
-    res.status(400).json({ error: "Invalid data" });
-  }
-});
-
-
-
-
-// ✅ Delete a mentor
-router.delete("/:id", async (req, res) => {
-  try {
-    await Mentor.findByIdAndDelete(req.params.id);
-    res.json({ message: "Mentor deleted" });
-  } catch (error) {
-    res.status(500).json({ error: "Server Error" });
+    res.status(200).json(mentors);
+  } catch (err) {
+    console.error("❌ Error fetching mentors:", err);
+    res.status(500).json({ error: "Failed to fetch mentors", details: err.message });
   }
 });
 

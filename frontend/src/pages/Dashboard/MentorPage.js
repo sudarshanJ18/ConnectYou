@@ -12,11 +12,11 @@ const MentorCard = ({ mentor, onRequestSession }) => (
     className="bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300 hover:shadow-xl"
   >
     <div className="relative">
-      <img
-        src={mentor.image}
-        alt={mentor.name}
-        className="w-full h-48 object-cover rounded-t-lg transition-transform duration-300 hover:scale-110"
-      />
+    <img
+  src={`http://localhost:5000/${mentor.image}`}  // prepend the server URL to the image path
+  alt={mentor.name}
+  className="w-full h-48 object-cover rounded-t-lg transition-transform duration-300 hover:scale-110"
+/>
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
     </div>
     <div className="p-6">
@@ -58,7 +58,8 @@ const MentorPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/mentors")
+    // Fixed URL: removed 'https:' (using 'http:' instead) as the local development server likely doesn't have SSL configured
+    axios.get("http://localhost:5000/api/mentor/")
       .then(res => setMentors(res.data))
       .catch(err => console.error("❌ Error fetching mentors:", err));
   }, []);
@@ -137,14 +138,20 @@ const MentorPage = () => {
           visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.2 } }
         }}
       >
-        {mentors
-          .filter(mentor =>
-            mentor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            mentor.expertise.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()))
-          )
-          .map(mentor => (
-            <MentorCard key={mentor._id} mentor={mentor} onRequestSession={handleRequestSession} />
-          ))}
+        {mentors.length > 0 ? (
+          mentors
+            .filter(mentor =>
+              mentor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              mentor.expertise && mentor.expertise.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()))
+            )
+            .map(mentor => (
+              <MentorCard key={mentor._id} mentor={mentor} onRequestSession={handleRequestSession} />
+            ))
+        ) : (
+          <div className="col-span-3 text-center py-12">
+            <p className="text-gray-500 text-lg">Loading mentors or no mentors available...</p>
+          </div>
+        )}
       </motion.div>
     </div>
   );

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const MentorSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -11,4 +11,4 @@ const MentorSchema = new mongoose.Schema({
   sessions: { type: Number, default: 0 },
 });
 
-module.exports = mongoose.model('Mentor', MentorSchema);
+module.exports = mongoose.model("Mentor", MentorSchema);

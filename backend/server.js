@@ -5,75 +5,70 @@ const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const morgan = require("morgan");
-const http = require("http"); // ✅ Added for HTTP server
-const chatRoutes = require('./routes/chatRoutes');
-const chatSocket = require('./socket/socket');
+const http = require("http");
+const path = require('path');
+const app = express();
 
 dotenv.config();
 
+// Your environment variable checks (as per previous configuration)
 const requiredEnvVars = [
     'MONGODB_URI',
     'GEMINI_API_KEY',
     'JWT_SECRET',
     'NODE_ENV'
 ];
-
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
 if (missingEnvVars.length > 0) {
     console.error('❌ Missing required environment variables:', missingEnvVars.join(', '));
     process.exit(1);
 }
 
-// Import all routes
+// Routes setup
 const profileRoutes = require('./routes/profile');
-// const authRoutes = require('./routes/auth');
 const aiRoutes = require('./routes/ai');
 const coursesRoutes = require('./routes/courses');
 const mentorRoutes = require('./routes/mentor');
 const usersRoutes = require('./routes/users');
 const errorHandler = require("./middleware/errorHandler");
 const requestLogger = require("./middleware/requestLogger");
-
-const app = express();
+const projectRoutes = require('./routes/projects');
 
 // Security and logging middleware
 app.use(helmet());
 app.use(morgan(process.env.NODE_ENV === 'development' ? 'dev' : 'combined'));
 
-// Rate limiting
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    message: "Too many requests from this IP, please try again later"
-});
-app.use("/api/", limiter);
-
-// Body parsers
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// CORS configuration
+// CORS Configuration (Global CORS handling)
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
         ? process.env.ALLOWED_ORIGINS?.split(',') 
-        : '*',
+        : '*', // Ensure you handle the CORS for both development and production
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
 }));
 
-// Create HTTP server
-const server = http.createServer(app);
+// Uploads Route CORS Configuration (Specific to Static Files)
+app.use('/uploads', (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');  // Allow cross-origin access
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
+}, express.static(path.join(__dirname, 'uploads')));
 
-// Initialize Socket.io
-const io = require('socket.io')(server, {
-    cors: {
-        origin: '*',
-        methods: ['GET', 'POST']
-    }
+// Rate limiting for API routes
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,  // 15 minutes
+    max: 100,  // Limit each IP to 100 requests per windowMs
+    message: "Too many requests from this IP, please try again later"
 });
+app.use("/api/", limiter);
 
-// Log all incoming requests for debugging
+// Body Parsers for JSON and URL Encoded Data
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Log all incoming requests
 app.use((req, res, next) => {
     console.log(`[${req.method}] ${req.url} - Headers:`, req.headers);
     next();
@@ -82,16 +77,15 @@ app.use((req, res, next) => {
 // Custom request logging middleware
 app.use(requestLogger);
 
-// Routes
+// Routes setup
 app.use("/api/profile", profileRoutes);
-// app.use("/api/auth", authRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/courses", coursesRoutes);
 app.use("/api/mentor", mentorRoutes);
 app.use("/api/users", usersRoutes);
-app.use('/api/chats', chatRoutes);
+app.use('/api/projects', projectRoutes);
 
-// Health check endpoint
+// Health check endpoint for service monitoring
 app.get("/health", (req, res) => {
     const status = {
         timestamp: new Date().toISOString(),
@@ -105,7 +99,7 @@ app.get("/health", (req, res) => {
     res.json(status);
 });
 
-// MongoDB connection with retry mechanism
+// MongoDB Connection with retry mechanism
 const connectDB = async (retries = 5) => {
     try {
         await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/connectyou', {
@@ -124,10 +118,10 @@ const connectDB = async (retries = 5) => {
     }
 };
 
-// Global error handler
+// Global error handler for the application
 app.use(errorHandler);
 
-// Graceful shutdown
+// Graceful shutdown handling
 const gracefulShutdown = async () => {
     console.log('🔄 Received shutdown signal');
     try {
@@ -149,6 +143,15 @@ process.on('unhandledRejection', (err) => {
     }
 });
 
+// Create HTTP server and initialize Socket.io
+const server = http.createServer(app);
+const io = require('socket.io')(server, {
+    cors: {
+        origin: '*',
+        methods: ['GET', 'POST']
+    }
+});
+
 // Start server
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
@@ -160,7 +163,8 @@ server.listen(PORT, () => {
     `);
 });
 
+// Connect to MongoDB and initialize the chat socket
 connectDB();
-chatSocket(io);
+// chatSocket(io);
 
 module.exports = { app, server };

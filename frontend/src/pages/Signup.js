@@ -1,7 +1,6 @@
-
 import React, { useState, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {  GraduationCap, UserSquare2, ArrowLeft, Loader2, BookOpen, Rocket, Trophy, Users} from 'lucide-react';
+import { GraduationCap, UserSquare2, ArrowLeft, Loader2, BookOpen, Rocket, Trophy, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const containerVariants = {
@@ -18,8 +17,9 @@ const containerVariants = {
   }
 };
 
+// Features component moved outside main container
 const Features = () => (
-  <div className="grid grid-cols-2 gap-4 mt-8">
+  <div className="w-full grid grid-cols-2 gap-4 mt-6">
     <motion.div 
       whileHover={{ scale: 1.05 }}
       className="p-4 rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100"
@@ -102,6 +102,7 @@ const FormField = memo(({ label, name, type = 'text', value, onChange, onBlur, e
     </AnimatePresence>
   </div>
 ));
+
 const Signup = memo(({ togglePage }) => {
   const navigate = useNavigate();
   const [userType, setUserType] = useState('');
@@ -143,18 +144,18 @@ const Signup = memo(({ togglePage }) => {
   const handleUserTypeChange = (type) => {
     setUserType(type);
     setFormData(prev => ({
-      firstName: '',        // Reset fields to their default state
+      firstName: '',
       lastName: '',
       email: '',
       password: '',
       confirmPassword: '',
       phone: '',
-      university: type === 'student' ? '' : prev.university,  // Retain university for alumni
-      branch: type === 'student' ? '' : prev.branch,          // Retain branch for alumni
-      yearOfStudy: type === 'student' ? '' : prev.yearOfStudy, // Retain year of study for alumni
-      studentId: type === 'student' ? '' : prev.studentId,     // Retain studentId for alumni
+      university: type === 'student' ? '' : prev.university,
+      branch: type === 'student' ? '' : prev.branch,
+      yearOfStudy: type === 'student' ? '' : prev.yearOfStudy,
+      studentId: type === 'student' ? '' : prev.studentId,
     }));
-    setStep(1); // Optionally reset the step if needed
+    setStep(1);
   };
 
   const handleInputChange = useCallback((e) => {
@@ -263,7 +264,7 @@ const Signup = memo(({ togglePage }) => {
   
       console.log('Form submitted successfully');
       window.alert('User registered successfully');
-      navigate('/login'); // 👈 redirecting to login page
+      navigate('/login');
     } catch (error) {
       setErrors(prev => ({ ...prev, submit: error.message || 'Registration failed. Please try again.' }));
       console.error('Error during submission:', error);
@@ -272,54 +273,64 @@ const Signup = memo(({ togglePage }) => {
     }
   };
   
-
-  if (!userType) {
-    return (
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        variants={containerVariants}
-        className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4"
-      >
-        <div className="max-w-2xl w-full space-y-8 bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl">
-          <div className="text-center">
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Welcome to ConnectYou
-            </h2>
-            <p className="mt-2 text-gray-600">Join our community of learners and achievers</p>
-          </div>
+  return (
+    <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+      {/* Left side info container (now 55% width) */}
+      <div className="w-6/12 bg-gradient-to-br from-indigo-600 to-purple-700 p-8 flex flex-col justify-center items-center text-white">
+        <div className="max-w-md mx-auto">
+          <h2 className="text-4xl font-bold mb-6">Welcome to ConnectYou</h2>
+          <p className="text-xl mb-8">Join our community of learners and achievers</p>
           
-          <div className="grid md:grid-cols-2 gap-8">
-  <div className="space-y-6">
-    <motion.button
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      onClick={() => handleUserTypeChange('student')}  // Using the handler
-      className="w-full flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
-    >
-      <GraduationCap className="w-6 h-6" />
-      <span className="text-lg">Continue as Student</span>
-    </motion.button>
+          {/* Features moved outside main container */}
+          <Features />
+        </div>
+      </div>
+      
+      {/* Right side form container (now 45% width) */}
+      <div className="w-6/12 flex justify-center items-center p-6">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          variants={containerVariants}
+          className="w-full max-w-md"
+        >
+          {!userType ? (
+            <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                  Choose Account Type
+                </h2>
+              </div>
+              
+              <div className="space-y-6">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleUserTypeChange('student')}
+                  className="w-full flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+                >
+                  <GraduationCap className="w-6 h-6" />
+                  <span className="text-lg">Continue as Student</span>
+                </motion.button>
 
-    <motion.button
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      onClick={() => handleUserTypeChange('alumni')}  // Using the handler
-      className="w-full flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
-    >
-      <UserSquare2 className="w-6 h-6" />
-      <span className="text-lg">Continue as Alumni</span>
-    </motion.button>
-  
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleUserTypeChange('alumni')}
+                  className="w-full flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+                >
+                  <UserSquare2 className="w-6 h-6" />
+                  <span className="text-lg">Continue as Alumni</span>
+                </motion.button>
+              </div>
 
-
-              <div className="text-center pt-4">
+              {/* Moved "Already have an account" to right container */}
+              <div className="mt-8 text-center">
                 <p className="text-gray-600">
                   Already have an account?{" "}
                   <button
-                    type="button"
-                    onClick={() => navigate('/login')}
+                    onClick={togglePage}
                     className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline transition-colors"
                   >
                     Sign in
@@ -327,264 +338,242 @@ const Signup = memo(({ togglePage }) => {
                 </p>
               </div>
             </div>
-
-            <Features />
-          </div>
-        </div>
-      </motion.div>
-    );
-  }
-
-  return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      variants={containerVariants}
-      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4"
-    >
-      <form onSubmit={handleSubmit} className="max-w-md w-full space-y-8 bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            {userType === 'student' ? 'Student Signup' : 'Alumni Signup'}
-          </h2>
-          <div className="mt-4 flex justify-center space-x-3">
-            <div 
-              className={`h-2 w-16 rounded-full ${step === 1 ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : 'bg-gray-200'}`}
-            />
-            <div 
-              className={`h-2 w-16 rounded-full ${step === 2 ? 'bg-gradient-to-r from-purple-600 to-pink-600' : 'bg-gray-200'}`}
-            />
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          <AnimatePresence mode="wait">
-            {step === 1 ? (
-              <motion.div
-                key="step1"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-6"
-              >
-                <div className="grid grid-cols-2 gap-6">
-                  <FormField
-                    label="First Name"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    onBlur={handleBlur}
-                    error={errors.firstName}
-                    touched={touched.firstName}
+          ) : (
+            <form onSubmit={handleSubmit} className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl">
+              <div className="text-center">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                  {userType === 'student' ? 'Student Signup' : 'Alumni Signup'}
+                </h2>
+                <div className="mt-4 flex justify-center space-x-3">
+                  <div 
+                    className={`h-2 w-16 rounded-full ${step === 1 ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : 'bg-gray-200'}`}
                   />
-                  <FormField
-                    label="Last Name"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    onBlur={handleBlur}
-                    error={errors.lastName}
-                    touched={touched.lastName}
+                  <div 
+                    className={`h-2 w-16 rounded-full ${step === 2 ? 'bg-gradient-to-r from-purple-600 to-pink-600' : 'bg-gray-200'}`}
                   />
                 </div>
-                <FormField
-                  label="Email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  onBlur={handleBlur}
-                  error={errors.email}
-                  touched={touched.email}
-                />
-                <FormField
-                  label="Password"
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  onBlur={handleBlur}
-                  error={errors.password}
-                  touched={touched.password}
-                />
-                <FormField
-                  label="Confirm Password"
-                  name="confirmPassword"
-                  type="password"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  onBlur={handleBlur}
-                  error={errors.confirmPassword}
-                  touched={touched.confirmPassword}
-                />
-                <FormField
-                  label="Phone Number"
-                  name="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  onBlur={handleBlur}
-                  error={errors.phone}
-                  touched={touched.phone}
-                />
+              </div>
 
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300" />
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white text-gray-500">
-                      Or continue with
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="step2"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-6"
-              >
-                {userType === 'student' ? (
-                  <>
-                    <FormField
-                      label="University Name"
-                      name="university"
-                      value={formData.university}
-                      onChange={handleInputChange}
-                      onBlur={handleBlur}
-                      error={errors.university}
-                      touched={touched.university}
-                    />
-                    <FormField
-                      label="Branch"
-                      name="branch"
-                      value={formData.branch}
-                      onChange={handleInputChange}
-                      onBlur={handleBlur}
-                      error={errors.branch}
-                      touched={touched.branch}
-                      options={branches}
-                    />
-                    <FormField
-                      label="Year of Study"
-                      name="yearOfStudy"
-                      value={formData.yearOfStudy}
-                      onChange={handleInputChange}
-                      onBlur={handleBlur}
-                      error={errors.yearOfStudy}
-                      touched={touched.yearOfStudy}
-                      options={studyYears}
-                    />
-                    <FormField
-                      label="Student ID"
-                      name="studentId"
-                      value={formData.studentId}
-                      onChange={handleInputChange}
-                      onBlur={handleBlur}
-                      error={errors.studentId}
-                      touched={touched.studentId}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <FormField
-                      label="Graduation Year"
-                      name="graduationYear"
-                      type="number"
-                      value={formData.graduationYear}
-                      onChange={handleInputChange}
-                      onBlur={handleBlur}
-                      error={errors.graduationYear}
-                      touched={touched.graduationYear}
-                    />
-                    <FormField
-                      label="Current Company"
-                      name="currentCompany"
-                      value={formData.currentCompany}
-                      onChange={handleInputChange}
-                      onBlur={handleBlur}
-                      error={errors.currentCompany}
-                      touched={touched.currentCompany}
-                    />
-                    <FormField
-                      label="Job Title"
-                      name="jobTitle"
-                      value={formData.jobTitle}
-                      onChange={handleInputChange}
-                      onBlur={handleBlur}
-                      error={errors.jobTitle}
-                      touched={touched.jobTitle}
-                    />
-                    <FormField
-                      label="Industry"
-                      name="industry"
-                      value={formData.industry}
-                      onChange={handleInputChange}
-                      onBlur={handleBlur}
-                      error={errors.industry}
-                      touched={touched.industry}
-                    />
-                  </>
+              <div className="space-y-6 mt-6">
+                <AnimatePresence mode="wait">
+                  {step === 1 ? (
+                    <motion.div
+                      key="step1"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.3 }}
+                      className="space-y-6"
+                    >
+                      <div className="grid grid-cols-2 gap-6">
+                        <FormField
+                          label="First Name"
+                          name="firstName"
+                          value={formData.firstName}
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          error={errors.firstName}
+                          touched={touched.firstName}
+                        />
+                        <FormField
+                          label="Last Name"
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          error={errors.lastName}
+                          touched={touched.lastName}
+                        />
+                      </div>
+                      <FormField
+                        label="Email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                        error={errors.email}
+                        touched={touched.email}
+                      />
+                      <FormField
+                        label="Password"
+                        name="password"
+                        type="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                        error={errors.password}
+                        touched={touched.password}
+                      />
+                      <FormField
+                        label="Confirm Password"
+                        name="confirmPassword"
+                        type="password"
+                        value={formData.confirmPassword}
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                        error={errors.confirmPassword}
+                        touched={touched.confirmPassword}
+                      />
+                      <FormField
+                        label="Phone Number"
+                        name="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        onBlur={handleBlur}
+                        error={errors.phone}
+                        touched={touched.phone}
+                      />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="step2"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.3 }}
+                      className="space-y-6"
+                    >
+                      {userType === 'student' ? (
+                        <>
+                          <FormField
+                            label="University Name"
+                            name="university"
+                            value={formData.university}
+                            onChange={handleInputChange}
+                            onBlur={handleBlur}
+                            error={errors.university}
+                            touched={touched.university}
+                          />
+                          <FormField
+                            label="Branch"
+                            name="branch"
+                            value={formData.branch}
+                            onChange={handleInputChange}
+                            onBlur={handleBlur}
+                            error={errors.branch}
+                            touched={touched.branch}
+                            options={branches}
+                          />
+                          <FormField
+                            label="Year of Study"
+                            name="yearOfStudy"
+                            value={formData.yearOfStudy}
+                            onChange={handleInputChange}
+                            onBlur={handleBlur}
+                            error={errors.yearOfStudy}
+                            touched={touched.yearOfStudy}
+                            options={studyYears}
+                          />
+                          <FormField
+                            label="Student ID"
+                            name="studentId"
+                            value={formData.studentId}
+                            onChange={handleInputChange}
+                            onBlur={handleBlur}
+                            error={errors.studentId}
+                            touched={touched.studentId}
+                          />
+                        </>
+                      ) : (
+                        <>
+                          <FormField
+                            label="Graduation Year"
+                            name="graduationYear"
+                            type="number"
+                            value={formData.graduationYear}
+                            onChange={handleInputChange}
+                            onBlur={handleBlur}
+                            error={errors.graduationYear}
+                            touched={touched.graduationYear}
+                          />
+                          <FormField
+                            label="Current Company"
+                            name="currentCompany"
+                            value={formData.currentCompany}
+                            onChange={handleInputChange}
+                            onBlur={handleBlur}
+                            error={errors.currentCompany}
+                            touched={touched.currentCompany}
+                          />
+                          <FormField
+                            label="Job Title"
+                            name="jobTitle"
+                            value={formData.jobTitle}
+                            onChange={handleInputChange}
+                            onBlur={handleBlur}
+                            error={errors.jobTitle}
+                            touched={touched.jobTitle}
+                          />
+                          <FormField
+                            label="Industry"
+                            name="industry"
+                            value={formData.industry}
+                            onChange={handleInputChange}
+                            onBlur={handleBlur}
+                            error={errors.industry}
+                            touched={touched.industry}
+                          />
+                        </>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <div className="flex items-center justify-between pt-6">
+                {step === 2 && (
+                  <button
+                    type="button"
+                    onClick={() => setStep(1)}
+                    className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 transition-colors"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back
+                  </button>
                 )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className={`flex items-center gap-2 px-6 py-3 ${step === 1 ? 'ml-auto' : ''} bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-1`}
+                >
+                  {isLoading && <Loader2 className="w-5 h-5 animate-spin" />}
+                  {step === 2 ? "Create Account" : "Next Step"}
+                </button>
+              </div>
 
-        <div className="flex items-center justify-between pt-4">
-          {step === 2 && (
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back
-            </button>
+              <AnimatePresence>
+                {errors.submit && (
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="mt-4 text-sm text-center text-red-600"
+                  >
+                    {errors.submit}
+                  </motion.p>
+                )}
+              </AnimatePresence>
+              
+              {/* Added "Already have an account" to the bottom of the form */}
+              <div className="mt-6 text-center">
+                <p className="text-gray-600">
+                  Already have an account?{" "}
+                  <button
+                    type="button"
+                    onClick={togglePage}
+                    className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline transition-colors"
+                  >
+                    Sign in
+                  </button>
+                </p>
+              </div>
+            </form>
           )}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`flex items-center gap-2 px-6 py-3 ${step === 1 ? 'ml-auto' : ''} bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-1`}
-          >
-            {isLoading && <Loader2 className="w-5 h-5 animate-spin" />}
-            {step === 2 ? "Create Account" : "Next Step"}
-          </button>
-        </div>
-
-        <AnimatePresence>
-          {errors.submit && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="mt-4 text-sm text-center text-red-600"
-            >
-              {errors.submit}
-            </motion.p>
-          )}
-        </AnimatePresence>
-
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            Already have an account?{" "}
-            <button
-              type="button"
-              onClick={togglePage}
-              className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline transition-colors"
-            >
-              Sign in
-            </button>
-          </p>
-        </div>
-      </form>
-    </motion.div>
+        </motion.div>
+      </div>
+    </div>
   );
 });
 

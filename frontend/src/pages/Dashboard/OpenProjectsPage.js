@@ -1,65 +1,38 @@
-import React, { useState } from 'react';
-import {  Search, GitBranch, Star, Clock, Tag } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, GitBranch, Star, Clock, Tag } from 'lucide-react';
+import axios from 'axios';
 
 const OpenProjectsPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
+  const [projects, setProjects] = useState([]);
 
   const categories = ['All', 'Web Development', 'Mobile Apps', 'AI/ML', 'DevOps', 'Blockchain'];
-
-  const projects = [
-    {
-      id: 1,
-      title: 'Open Source Learning Platform',
-      category: 'Web Development',
-      description: 'Building a modern e-learning platform with React and Node.js',
-      tech: ['React', 'Node.js', 'PostgreSQL'],
-      difficulty: 'Intermediate',
-      contributors: 12,
-      stars: 156,
-      lastActive: '2 days ago',
-      maintainer: {
-        name: 'Sarah Chen',
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=80&q=80'
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const token = localStorage.getItem('token');
+  
+        const params = {};
+        if (selectedCategory && selectedCategory !== 'All') params.category = selectedCategory;
+        if (searchTerm) params.search = searchTerm;
+  
+        const response = await axios.get('http://localhost:5000/api/projects', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          params
+        });
+  
+        setProjects(response.data);
+      } catch (error) {
+        console.error('Failed to fetch projects:', error);
       }
-    },
-    {
-      id: 2,
-      title: 'AI-Powered Code Assistant',
-      category: 'AI/ML',
-      description: 'Developing an AI assistant for code review and suggestions',
-      tech: ['Python', 'TensorFlow', 'FastAPI'],
-      difficulty: 'Advanced',
-      contributors: 8,
-      stars: 234,
-      lastActive: '1 day ago',
-      maintainer: {
-        name: 'Mark Rodriguez',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=80&q=80'
-      }
-    },
-    {
-      id: 3,
-      title: 'DevOps Automation Tools',
-      category: 'DevOps',
-      description: 'Collection of tools for automating deployment workflows',
-      tech: ['Go', 'Docker', 'Kubernetes'],
-      difficulty: 'Intermediate',
-      contributors: 15,
-      stars: 312,
-      lastActive: '3 days ago',
-      maintainer: {
-        name: 'Emma Watson',
-        avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=80&q=80'
-      }
-    }
-  ];
-
-  const filteredProjects = projects.filter(project => 
-    (selectedCategory === 'All' || project.category === selectedCategory) &&
-    (project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     project.description.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+    };
+  
+    fetchProjects();
+  }, [selectedCategory, searchTerm]);
+  
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -100,70 +73,76 @@ const OpenProjectsPage = () => {
 
       {/* Projects List */}
       <div className="space-y-4">
-        {filteredProjects.map(project => (
-          <div key={project.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-start gap-4">
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-xl font-semibold">{project.title}</h3>
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center text-gray-600">
-                      <Star className="w-4 h-4 mr-1" />
-                      <span>{project.stars}</span>
-                    </div>
-                    <div className="flex items-center text-gray-600">
-                      <GitBranch className="w-4 h-4 mr-1" />
-                      <span>{project.contributors}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <p className="text-gray-600 mb-4">{project.description}</p>
-
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {project.tech.map(tech => (
-                    <span key={tech} className="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-sm">
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
-                    <div className="flex items-center">
-                      <Tag className="w-4 h-4 mr-1" />
-                      {project.difficulty}
-                    </div>
-                    <div className="flex items-center">
-                      <Clock className="w-4 h-4 mr-1" />
-                      Last active {project.lastActive}
+        {projects.length === 0 ? (
+          <p className="text-gray-500">No projects found.</p>
+        ) : (
+          projects.map(project => (
+            <div key={project._id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-start gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-xl font-semibold">{project.title}</h3>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center text-gray-600">
+                        <Star className="w-4 h-4 mr-1" />
+                        <span>{project.stars || 0}</span>
+                      </div>
+                      <div className="flex items-center text-gray-600">
+                        <GitBranch className="w-4 h-4 mr-1" />
+                        <span>{project.contributors || 0}</span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={project.maintainer.avatar}
-                      alt={project.maintainer.name}
-                      className="w-6 h-6 rounded-full"
-                    />
-                    <span className="text-sm text-gray-600">
-                      Maintained by {project.maintainer.name}
-                    </span>
-                  </div>
-                </div>
+                  <p className="text-gray-600 mb-4">{project.description}</p>
 
-                <div className="mt-4 flex gap-2">
-                  <button className="bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
-                    View Project
-                  </button>
-                  <button className="border border-purple-600 text-purple-600 py-2 px-4 rounded-lg hover:bg-purple-50 transition-colors">
-                    Star Project
-                  </button>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {project.tech?.map((tech, index) => (
+                      <span key={index} className="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-sm">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <div className="flex items-center">
+                        <Tag className="w-4 h-4 mr-1" />
+                        {project.difficulty || 'Unknown'}
+                      </div>
+                      <div className="flex items-center">
+                        <Clock className="w-4 h-4 mr-1" />
+                        Last active {project.lastActive || 'Recently'}
+                      </div>
+                    </div>
+
+                    {project.maintainer && (
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={project.maintainer.avatar}
+                          alt={project.maintainer.name}
+                          className="w-6 h-6 rounded-full"
+                        />
+                        <span className="text-sm text-gray-600">
+                          Maintained by {project.maintainer.name}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mt-4 flex gap-2">
+                    <button className="bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+                      View Project
+                    </button>
+                    <button className="border border-purple-600 text-purple-600 py-2 px-4 rounded-lg hover:bg-purple-50 transition-colors">
+                      Star Project
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
