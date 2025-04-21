@@ -1,50 +1,40 @@
-import React, { useState } from 'react';
-import {  MapPin, DollarSign, Clock, Building, Search } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { MapPin, DollarSign, Clock, Building, Search } from 'lucide-react';
 
 const JobsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('All');
+  const [jobs, setJobs] = useState([]); // State to store job data from backend
+  const [loading, setLoading] = useState(true); // State to manage loading status
 
   const jobTypes = ['All', 'Full-time', 'Part-time', 'Internship', 'Contract'];
 
-  const jobs = [
-    {
-      id: 1,
-      title: 'Senior Frontend Developer',
-      company: 'TechCorp',
-      location: 'San Francisco, CA',
-      type: 'Full-time',
-      salary: '$120k - $150k',
-      posted: '2 days ago',
-      logo: 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?auto=format&fit=crop&w=80&h=80&q=80'
-    },
-    {
-      id: 2,
-      title: 'Data Science Intern',
-      company: 'DataCo',
-      location: 'Remote',
-      type: 'Internship',
-      salary: '$30/hr',
-      posted: '1 day ago',
-      logo: 'https://images.unsplash.com/photo-1568952433726-3896e3881c65?auto=format&fit=crop&w=80&h=80&q=80'
-    },
-    {
-      id: 3,
-      title: 'DevOps Engineer',
-      company: 'CloudTech',
-      location: 'New York, NY',
-      type: 'Full-time',
-      salary: '$130k - $160k',
-      posted: '3 days ago',
-      logo: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&w=80&h=80&q=80'
-    }
-  ];
+  useEffect(() => {
+    // Fetch job data from backend API
+    const fetchJobs = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/jobs'); // Adjust the URL if needed
+        const data = await response.json();
+        setJobs(data); // Set the jobs data from backend
+      } catch (error) {
+        console.error('Error fetching job data:', error);
+      } finally {
+        setLoading(false); // Set loading to false after fetching
+      }
+    };
 
-  const filteredJobs = jobs.filter(job => 
+    fetchJobs(); // Call the fetchJobs function when the component mounts
+  }, []);
+
+  const filteredJobs = jobs.filter(job =>
     (selectedType === 'All' || job.type === selectedType) &&
     (job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     job.company.toLowerCase().includes(searchTerm.toLowerCase()))
+      job.company.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  if (loading) {
+    return <div>Loading...</div>; // Loading state
+  }
 
   return (
     <div className="p-6 max-w-7xl mx-auto">

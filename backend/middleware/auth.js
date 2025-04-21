@@ -17,7 +17,7 @@ const authenticateUser = async (req, res, next) => {
     if (!user) {
       return res.status(401).json({ message: 'User not found' });
     }
-
+    req.token = token;
     req.user = {
       id: user._id,
       role: user.role

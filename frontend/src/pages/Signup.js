@@ -273,6 +273,14 @@ const Signup = memo(({ togglePage }) => {
     }
   };
   
+  const handleSignInClick = (e) => {
+    e.preventDefault();
+    if (togglePage) {
+      togglePage();
+    }
+    navigate('/login');
+  };
+  
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
       {/* Left side info container (now 55% width) */}
@@ -330,7 +338,7 @@ const Signup = memo(({ togglePage }) => {
                 <p className="text-gray-600">
                   Already have an account?{" "}
                   <button
-                    onClick={togglePage}
+                    onClick={handleSignInClick}
                     className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline transition-colors"
                   >
                     Sign in
@@ -562,7 +570,7 @@ const Signup = memo(({ togglePage }) => {
                   Already have an account?{" "}
                   <button
                     type="button"
-                    onClick={togglePage}
+                    onClick={handleSignInClick}
                     className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline transition-colors"
                   >
                     Sign in

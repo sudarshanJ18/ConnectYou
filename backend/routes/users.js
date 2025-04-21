@@ -21,6 +21,7 @@ router.post('/register', async (req, res) => {
       university,
       branch,
       yearOfStudy,
+      regno,
       studentId,
       currentCompany,
       jobTitle,
@@ -86,7 +87,7 @@ router.post('/register', async (req, res) => {
         university: validator.escape(university.trim()),
         branch,
         yearOfStudy,
-        studentId: validator.escape(studentId.trim())
+        regno: validator.escape(studentId.trim())
       });
     } else if (userType === 'alumni') {
       Object.assign(userData, {
@@ -118,7 +119,7 @@ router.post('/register', async (req, res) => {
       token,
       user: {
         id: user._id,
-        user_id: user.user_id, // Include this line
+        user_id: user.user_id, 
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
