@@ -26,6 +26,7 @@ import AlumniEvents from './pages/Dashboard/AlumniEvents';
 import AlumniMessages from './pages/Dashboard/AlumniMessages';
 import AlumniProfile from './pages/Dashboard/AlumniProfile';
 import AlumniAIAssistant from './pages/Dashboard/AlumniAIAssistant';
+import AlumniProjects from './pages/Dashboard/AlumniProjects';
 
 const App = () => {
   return (
@@ -56,6 +57,8 @@ const App = () => {
       <Route path="/alumni/messages" element={<AlumniMessages />} />
       <Route path="/alumni/ai-assistant" element={<AlumniAIAssistant />} />
       <Route path="/alumni/profile" element={<AlumniProfile />} />
+      <Route path="/alumni/projects" element={<AlumniProjects />} />
+
     </Routes>
   );
 };
