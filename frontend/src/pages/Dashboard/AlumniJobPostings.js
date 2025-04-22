@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
-import AlumniNavbar from "./AlumniNavbar";
+import Navbar from '../../components/shared/Navbar';
 import { Briefcase, Building2, MapPin, Clock } from 'lucide-react';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
 };
-
-
-
 
 const AlumniJobPostings = () => {
   const [showForm, setShowForm] = useState(false);
@@ -42,7 +39,7 @@ const AlumniJobPostings = () => {
   }, []);
 
   const [editMode, setEditMode] = useState(false);
-const [editJobId, setEditJobId] = useState(null);
+  const [editJobId, setEditJobId] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -106,7 +103,6 @@ const [editJobId, setEditJobId] = useState(null);
     }
   };
   
-
   const handleDelete = async (jobId) => {
     try {
       const response = await fetch(`http://localhost:5000/api/jobs/${jobId}`, {
@@ -133,12 +129,11 @@ const [editJobId, setEditJobId] = useState(null);
   const applications = calculateApplicationStats();
 
   return (
-    <div className="flex">
-      {/* Sidebar */}
-      <AlumniNavbar />
-
-      {/* Main Content */}
-      <div className="ml-64 p-6 bg-gray-100 min-h-screen w-full">
+    <div className="flex min-h-screen">
+      <div className="flex-none">
+        <Navbar type="alumni" />
+      </div>
+      <main className="flex-1 p-6 bg-gray-100 ml-64">
         {/* Animated Heading */}
         <motion.h1
           initial={{ opacity: 0, scale: 0.8 }}
@@ -364,7 +359,7 @@ const [editJobId, setEditJobId] = useState(null);
             </div>
           </motion.div>
         </motion.div>
-      </div>
+      </main>
     </div>
   );
 };

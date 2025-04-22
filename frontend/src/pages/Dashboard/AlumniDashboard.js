@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import AlumniNavbar from "./AlumniNavbar";
+import Navbar from '../../components/shared/Navbar';
 import { Users, Briefcase, MessageSquare, Calendar, Award } from "lucide-react";
 
 const containerVariants = {
@@ -118,7 +118,7 @@ const AlumniDashboard = () => {
 
   return (
     <div className="flex">
-      <AlumniNavbar />
+      <Navbar type="alumni" />
 
       <motion.div
         initial="hidden"

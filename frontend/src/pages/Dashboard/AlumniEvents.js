@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
-import AlumniNavbar from "./AlumniNavbar";
+import Navbar from '../../components/shared/Navbar';
 import { Calendar, Users, MapPin, Clock, Plus } from 'lucide-react';
 
 const cardVariants = {
@@ -215,7 +215,7 @@ const [editingId, setEditingId] = useState(null);
   return (
     <div className="flex">
       {/* Sidebar */}
-      <AlumniNavbar />
+      <Navbar type="alumni" />
 
       {/* Main Content */}
       <div className="ml-64 p-6 bg-gray-100 min-h-screen w-full">

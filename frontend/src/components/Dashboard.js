@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Bell, MessageSquare, LogOut, ChevronRight, User, BookOpen, 
   Briefcase, Calendar, Users, HelpCircle, LineChart, GraduationCap, 
   Play, Book, Award, Clock, MapPin
 } from "lucide-react";
 import { 
- 
   Routes, 
   Route, 
   Link, 
   Navigate 
 } from "react-router-dom";
+import StudentNavbar from '../components/shared/Navbar';
 
 // Import page components
 import AIAssistantPage from "../pages/Dashboard/AIAssistantPage";
@@ -25,7 +25,7 @@ import StudentProfilePage from "../pages/Dashboard/StudentProfilePage";
 
 import { useNavigate } from 'react-router-dom';
 
-
+// DashboardContent and other page components remain unchanged...
 // Dashboard Content Component
 const DashboardContent = () => {
   const notifications = [
@@ -33,8 +33,6 @@ const DashboardContent = () => {
     { id: 2, text: 'Upcoming workshop: Advanced React', type: 'info' },
     { id: 3, text: 'Career fair next week', type: 'warning' }
   ];
-
-  
 
   const featuredServices = [
     {
@@ -112,7 +110,6 @@ const DashboardContent = () => {
   ];
 
   return (
-    
     <>
       {/* Notifications Section */}
       <div className="space-y-2 mb-6">
@@ -172,6 +169,7 @@ const DashboardContent = () => {
         ))}
       </div>
 
+      {/* Featured Services and Instructors sections remain unchanged... */}
       {/* Featured Services Section */}
       <h3 className="text-lg font-semibold mb-4">Featured Services</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -224,71 +222,7 @@ const DashboardContent = () => {
   );
 };
 
-// Profile Page Component
-// const ProfilePage = () => {
-//   const userProfile = {
-//     name: "Alex Johnson",
-//     role: "Software Developer",
-//     email: "alex.j@example.com",
-//     location: "San Francisco, CA",
-//     skills: ["React", "Node.js", "Python", "AWS"],
-//     education: "MS Computer Science",
-//     interests: ["AI/ML", "Web Development", "Cloud Architecture"]
-//   };
-
-//   return (
-//     <div className="max-w-4xl mx-auto">
-//       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-//         <div className="flex items-center mb-6">
-//           <div className="w-24 h-24 bg-purple-200 rounded-full flex items-center justify-center">
-//             <User className="w-12 h-12 text-purple-600" />
-//           </div>
-//           <div className="ml-6">
-//             <h2 className="text-2xl font-bold">{userProfile.name}</h2>
-//             <p className="text-gray-600">{userProfile.role}</p>
-//             <p className="text-gray-500">{userProfile.location}</p>
-//           </div>
-//         </div>
-        
-//         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//           <div>
-//             <h3 className="text-lg font-semibold mb-3">Contact Information</h3>
-//             <p className="text-gray-600 mb-2">Email: {userProfile.email}</p>
-//           </div>
-          
-//           <div>
-//             <h3 className="text-lg font-semibold mb-3">Education</h3>
-//             <p className="text-gray-600">{userProfile.education}</p>
-//           </div>
-//         </div>
-
-//         <div className="mt-6">
-//           <h3 className="text-lg font-semibold mb-3">Skills</h3>
-//           <div className="flex flex-wrap gap-2">
-//             {userProfile.skills.map(skill => (
-//               <span key={skill} className="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-sm">
-//                 {skill}
-//               </span>
-//             ))}
-//           </div>
-//         </div>
-
-//         <div className="mt-6">
-//           <h3 className="text-lg font-semibold mb-3">Interests</h3>
-//           <div className="flex flex-wrap gap-2">
-//             {userProfile.interests.map(interest => (
-//               <span key={interest} className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">
-//                 {interest}
-//               </span>
-//             ))}
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// Events Page Component
+// Events Page Component remains unchanged...
 const EventsPage = () => {
   const events = [
     {
@@ -334,9 +268,8 @@ const EventsPage = () => {
   );
 };
 
-// Main Dashboard Component
+// Main Dashboard Component - Enhanced to fix layout issues
 const Dashboard = () => {
-  const [activeMenuItem, setActiveMenuItem] = useState("Dashboard");
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState('');
   const navigate = useNavigate();
@@ -347,26 +280,10 @@ const Dashboard = () => {
       setUserName(storedName);
     }
     
-    
     const timer = setTimeout(() => setIsLoading(false), 1000);
     
     return () => clearTimeout(timer);
   }, []);
-  
-
-  const menuItems = [
-    { name: "Dashboard", icon: <LineChart className="w-4 h-4" />, path: "/" },
-    { name: "E-Learning", icon: <GraduationCap className="w-4 h-4" />, path: "/e-learning" },
-    { name: "Mentorship", icon: <Users className="w-4 h-4" />, path: "/mentorship" },
-    { name: "Jobs & Internships", icon: <Briefcase className="w-4 h-4" />, path: "/jobs" },
-    { name: "Messages", icon: <MessageSquare className="w-4 h-4" />, path: "/messages" },
-    { name: "Events", icon: <Calendar className="w-4 h-4" />, path: "/events" },
-    { name: "Open-Projects", icon: <BookOpen className="w-4 h-4" />, path: "/open-projects" },
-    { name: "AI Assistant", icon: <HelpCircle className="w-4 h-4" />, path: "/ai-assistant" },
-    { name: "Workshops", icon: <Users className="w-4 h-4" />, path: "/workshops" },
-    { name: "Profile", icon: <User className="w-4 h-4" />, path: "/profile" }
-  ];
-  
 
   if (isLoading) {
     return (
@@ -377,36 +294,16 @@ const Dashboard = () => {
   }
 
   return (
-    
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <div className="w-64 bg-white shadow-lg">
-        <div className="p-4">
-          <h1 className="text-2xl font-bold text-purple-600 animate-fade-in">ConnectYou</h1>
-        </div>
-        <nav className="mt-4">
-          {menuItems.map((item) => (
-            <Link
-              key={item.name}
-              to={item.path}
-              onClick={() => setActiveMenuItem(item.name)}
-              className={`w-full flex items-center px-4 py-3 text-sm transition-all duration-200 ease-in-out ${
-                activeMenuItem === item.name
-                  ? "bg-purple-50 text-purple-600 border-r-4 border-purple-600"
-                  : "text-gray-600 hover:bg-gray-50"
-              }`}
-            >
-              {item.icon}
-              <span className="ml-3">{item.name}</span>
-            </Link>
-          ))}
-        </nav>
+      {/* Sidebar/Navbar - Fixed position */}
+      <div className="fixed inset-y-0 left-0 z-30">
+        <StudentNavbar />
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 overflow-auto">
+      {/* Main Content Area - With proper margin to avoid navbar overlay */}
+      <div className="flex-1 ml-64">
         {/* Header */}
-        <header className="bg-white shadow-sm sticky top-0 z-10">
+        <header className="bg-white shadow-sm sticky top-0 z-20">
           <div className="flex items-center justify-between px-6 py-4">
             <h2 className="text-xl font-semibold text-gray-800">Welcome back, {userName}</h2>
             <div className="flex items-center space-x-4">
@@ -414,37 +311,37 @@ const Dashboard = () => {
                 <Bell className="h-5 w-5" />
               </button>
               <button
-  className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
-  onClick={() => navigate('/profile')}
->
-  <User className="h-5 w-5" />
-</button>
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
+                onClick={() => navigate('/profile')}
+              >
+                <User className="h-5 w-5" />
+              </button>
               <button
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
                 onClick={() => navigate('/login')}
-><LogOut className="h-5 w-5" />
-</button>
+              >
+                <LogOut className="h-5 w-5" />
+              </button>
             </div>
           </div>
         </header>
 
-        {/* Routes */}
-        <main className="p-6">
-        <Routes>
-              <Route path="/" element={<DashboardContent />} />
-              <Route path="/e-learning" element={<ELearningPage />} />
-              <Route path="/mentorship" element={<MentorPage />} />
-              <Route path="/jobs" element={<JobsPage />} />
-              <Route path="/messages" element={<MessagesPage />} />
-              <Route path="/events" element={<EventsPage />} />
-              <Route path="/open-projects" element={<OpenProjectsPage />} />
-              <Route path="/ai-assistant" element={<AIAssistantPage />} />
-              <Route path="/workshops" element={<WorkshopsPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/studentprofile" element={<StudentProfilePage />} />
-              
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+        {/* Main Content with scrollable area */}
+        <main className="p-6 overflow-auto h-[calc(100vh-64px)]">
+          <Routes>
+            <Route path="/" element={<DashboardContent />} />
+            <Route path="/e-learning" element={<ELearningPage />} />
+            <Route path="/mentorship" element={<MentorPage />} />
+            <Route path="/jobs" element={<JobsPage />} />
+            <Route path="/messages" element={<MessagesPage />} />
+            <Route path="/events" element={<EventsPage />} />
+            <Route path="/open-projects" element={<OpenProjectsPage />} />
+            <Route path="/ai-assistant" element={<AIAssistantPage />} />
+            <Route path="/workshops" element={<WorkshopsPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/studentprofile" element={<StudentProfilePage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
         </main>
       </div>
     </div>

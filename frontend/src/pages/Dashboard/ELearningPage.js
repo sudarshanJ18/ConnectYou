@@ -8,6 +8,7 @@ import {
   Calendar,
   Bookmark
 } from 'lucide-react';
+import Navbar from '../../components/shared/Navbar';
 
 // Native Button Component
 const Button = ({ 
@@ -265,118 +266,123 @@ const ELearningPage = () => {
   };
   
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div className="flex-1">
-              <h1 className="text-4xl font-bold mb-2">Expand Your Knowledge</h1>
-              <p className="text-purple-100 text-lg">
-                Learn from industry experts and advance your career
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <Button variant="secondary">
-                <Calendar className="w-5 h-5 mr-2" />
-                Learning Plan
-              </Button>
-              <Button variant="secondary">
-                <Bookmark className="w-5 h-5 mr-2" />
-                Saved Courses
-              </Button>
-            </div>
-          </div>
-        </div>
+    <div className="flex min-h-screen">
+      <div className="flex-none">
+        <Navbar type="student" />
       </div>
-
-      {/* Filters */}
-      <div className="bg-white border-b sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Search courses..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <div className="flex gap-4">
-              <Select 
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-[180px]"
-              >
-                {categories.map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.label}
-                  </option>
-                ))}
-              </Select>
-              
-              <Select
-                value={selectedLevel}
-                onChange={(e) => setSelectedLevel(e.target.value)}
-                className="w-[180px]"
-              >
-                {levels.map(level => (
-                  <option key={level.id} value={level.id}>
-                    {level.label}
-                  </option>
-                ))}
-              </Select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600" />
-          </div>
-        ) : (
-          <>
-            {/* Recommended Courses */}
-            <div className="mb-12">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">Recommended for You</h2>
-                <Button variant="ghost" className="text-purple-600">
-                  View All
+      <div className="flex-1 ml-64">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+              <div className="flex-1">
+                <h1 className="text-4xl font-bold mb-2">Expand Your Knowledge</h1>
+                <p className="text-purple-100 text-lg">
+                  Learn from industry experts and advance your career
+                </p>
+              </div>
+              <div className="flex items-center gap-4">
+                <Button variant="secondary">
+                  <Calendar className="w-5 h-5 mr-2" />
+                  Learning Plan
+                </Button>
+                <Button variant="secondary">
+                  <Bookmark className="w-5 h-5 mr-2" />
+                  Saved Courses
                 </Button>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {recommendedCourses.map(course => (
-                  <CourseCard
-                    key={course.id}
-                    course={course}
-                    onEnroll={handleEnroll}
-                    recommended
-                  />
-                ))}
+            </div>
+          </div>
+        </div>
+    
+        {/* Filters */}
+        <div className="bg-white border-b sticky top-0 z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Search courses..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <div className="flex gap-4">
+                <Select 
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-[180px]"
+                >
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.label}
+                    </option>
+                  ))}
+                </Select>
+                
+                <Select
+                  value={selectedLevel}
+                  onChange={(e) => setSelectedLevel(e.target.value)}
+                  className="w-[180px]"
+                >
+                  {levels.map(level => (
+                    <option key={level.id} value={level.id}>
+                      {level.label}
+                    </option>
+                  ))}
+                </Select>
               </div>
             </div>
-
-            {/* All Courses */}
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold">All Courses</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {courses.map(course => (
-                  <CourseCard
-                    key={course.id}
-                    course={course}
-                    onEnroll={handleEnroll}
-                  />
-                ))}
-              </div>
+          </div>
+        </div>
+    
+        {/* Main Content */}
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600" />
             </div>
-          </>
-        )}
-      </main>
+          ) : (
+            <>
+              {/* Recommended Courses */}
+              <div className="mb-12">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold">Recommended for You</h2>
+                  <Button variant="ghost" className="text-purple-600">
+                    View All
+                  </Button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {recommendedCourses.map(course => (
+                    <CourseCard
+                      key={course.id}
+                      course={course}
+                      onEnroll={handleEnroll}
+                      recommended
+                    />
+                  ))}
+                </div>
+              </div>
+    
+              {/* All Courses */}
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold">All Courses</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {courses.map(course => (
+                    <CourseCard
+                      key={course.id}
+                      course={course}
+                      onEnroll={handleEnroll}
+                    />
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </main>
+      </div>
     </div>
   );
 };

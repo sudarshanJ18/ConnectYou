@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from "framer-motion";
-import AlumniNavbar from "./AlumniNavbar";
+import Navbar from '../../components/shared/Navbar';
 import axios from 'axios';
 import { FolderOpen, Plus, Clock, X } from 'lucide-react';
 
@@ -87,7 +87,7 @@ const AlumniProjects = () => {
 
   return (
     <div className="flex">
-      <AlumniNavbar />
+     <Navbar type="alumni" />
 
       <div className="ml-64 p-6 bg-gray-100 min-h-screen w-full">
         <motion.h1

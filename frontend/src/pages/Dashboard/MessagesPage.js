@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquare, Send, Search } from 'lucide-react';
+import { motion } from "framer-motion";
+import { Search, Send, MessageSquare } from 'lucide-react';
 import axios from 'axios';
 import io from 'socket.io-client';
+import Navbar from '../../components/shared/Navbar';
 
 let socket;
 
@@ -83,6 +85,10 @@ const MessagesPage = () => {
       socket.disconnect();
     };
   }, [currentUser, selectedChat]);
+
+  useEffect(() => {
+    fetchChats();
+  }, []);
 
   const fetchChats = async () => {
     try {
@@ -197,90 +203,153 @@ const MessagesPage = () => {
   );
 
   return (
-    <div className="h-[calc(100vh-120px)] flex">
-      {/* Chat List */}
-      {/* ... your existing chat list code ... */}
+    <div className="flex min-h-screen bg-gray-100">
+      {/* Fixed Sidebar Navigation */}
+      <div className="flex-none">
+        <Navbar type="student" />
+      </div>
 
-      {/* Chat Window */}
-      {selectedChat ? (
-        <div className="flex-1 flex flex-col bg-gray-50">
-          <div className="p-4 bg-white border-b">
-            <div className="flex items-center">
-              <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
-                {selectedChat.otherUser.avatar ? (
-                  <img 
-                    src={selectedChat.otherUser.avatar} 
-                    alt={`${selectedChat.otherUser.firstName} ${selectedChat.otherUser.lastName}`} 
-                    className="w-10 h-10 rounded-full" 
-                  />
-                ) : (
-                  <span>
-                    {selectedChat.otherUser.firstName[0]}{selectedChat.otherUser.lastName[0]}
-                  </span>
-                )}
+      {/* Main Content Area - Shifted right to accommodate sidebar */}
+      <div className="flex-1 ml-64">
+        <div className="flex h-full">
+          {/* Chat List Sidebar */}
+          <div className="w-1/4 bg-white border-r border-gray-200">
+            <div className="p-4 border-b">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="Search alumni..."
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:border-green-500"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
               </div>
-              <div className="ml-3">
-                <h2 className="font-semibold">
-                  {selectedChat.otherUser.firstName} {selectedChat.otherUser.lastName}
-                </h2>
-                <div className="text-sm text-gray-500">
-                  {selectedChat.otherUser.userType === 'student' ? 'Student' : 'Alumni'}
-                </div>
-              </div>
+            </div>
+            <div className="overflow-y-auto h-[calc(100vh-64px)]">
+              {filteredChats.map((chat) => (
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  key={chat._id}
+                  className={`p-4 border-b cursor-pointer transition-colors ${
+                    selectedChat?._id === chat._id ? 'bg-green-50' : 'hover:bg-gray-50'
+                  }`}
+                  onClick={() => setSelectedChat(chat)}
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold">
+                      {chat.otherUser.firstName[0]}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold">{`${chat.otherUser.firstName} ${chat.otherUser.lastName}`}</h3>
+                      <p className="text-sm text-gray-500 truncate">
+                        {chat.lastMessage.content}
+                      </p>
+                    </div>
+                    {chat.unreadCount > 0 && (
+                      <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs">
+                        {chat.unreadCount}
+                      </span>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {loading ? (
-              <div className="text-center text-gray-400">Loading messages...</div>
-            ) : (
-              messages.map((msg) => (
-                <div
-                  key={msg._id}
-                  className={`max-w-xs p-3 rounded-lg ${
-                    msg.sender === currentUser.user_id
-                      ? 'bg-purple-600 text-white self-end'
-                      : 'bg-white text-gray-900 self-start border'
-                  }`}
-                >
-                  <div>{msg.content}</div>
-                  <div className="text-xs text-gray-300 mt-1 text-right">
-                    {formatTime(msg.timestamp)}
+          {/* Chat Area */}
+          <div className="flex-1 flex flex-col bg-gray-50">
+            {selectedChat ? (
+              <>
+                {/* Chat Header */}
+                <div className="p-4 bg-white border-b flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold">
+                    {selectedChat.otherUser.firstName[0]}
+                  </div>
+                  <div>
+                    <h2 className="font-semibold">{`${selectedChat.otherUser.firstName} ${selectedChat.otherUser.lastName}`}</h2>
+                    <p className="text-sm text-gray-500">{selectedChat.otherUser.userType}</p>
                   </div>
                 </div>
-              ))
-            )}
-            {isTyping && (
-              <div className="text-sm text-gray-400 italic">Typing...</div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
 
-          <form
-            onSubmit={handleSendMessage}
-            className="flex items-center p-4 border-t bg-white"
-          >
-            <input
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={handleTyping}
-              placeholder="Type a message..."
-              className="flex-1 p-2 border rounded-lg mr-2"
-            />
-            <button
-              type="submit"
-              className="bg-purple-600 text-white px-4 py-2 rounded-lg"
-            >
-              <Send className="w-5 h-5" />
-            </button>
-          </form>
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto p-4">
+                  <div className="space-y-4">
+                    {messages.map((msg) => (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        key={msg._id}
+                        className={`flex ${msg.sender === currentUser.user_id ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div
+                          className={`max-w-[70%] p-3 rounded-lg ${
+                            msg.sender === currentUser.user_id
+                              ? 'bg-green-500 text-white rounded-br-none'
+                              : 'bg-white text-gray-800 rounded-bl-none'
+                          }`}
+                        >
+                          <p>{msg.content}</p>
+                          <p className="text-xs mt-1 opacity-70">
+                            {new Date(msg.timestamp).toLocaleTimeString()}
+                          </p>
+                        </div>
+                      </motion.div>
+                    ))}
+                    {isTyping && (
+                      <div className="flex justify-start">
+                        <div className="bg-gray-200 p-3 rounded-lg">
+                          <div className="flex space-x-2">
+                            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-100"></div>
+                            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-200"></div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    <div ref={messagesEndRef} />
+                  </div>
+                </div>
+
+                {/* Message Input */}
+                <div className="p-4 bg-white border-t">
+                  <form onSubmit={handleSendMessage} className="flex space-x-4">
+                    <input
+                      type="text"
+                      value={message}
+                      onChange={(e) => {
+                        setMessage(e.target.value);
+                        handleTyping();
+                      }}
+                      placeholder="Type your message..."
+                      className="flex-1 p-2 border rounded-lg focus:outline-none focus:border-green-500"
+                    />
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      type="submit"
+                      className="bg-green-500 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-green-600 transition-colors"
+                      disabled={!message.trim()}
+                    >
+                      <Send size={20} />
+                      <span>Send</span>
+                    </motion.button>
+                  </form>
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center text-gray-500">
+                  <MessageSquare size={48} className="mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold">Select a conversation</h3>
+                  <p>Choose an alumni from the list to start messaging</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      ) : (
-        <div className="flex-1 flex items-center justify-center text-gray-500">
-          Select a chat to start messaging
-        </div>
-      )}
+      </div>
     </div>
   );
 };

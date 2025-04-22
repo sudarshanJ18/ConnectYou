@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, DollarSign, Clock, Building, Search } from 'lucide-react';
+import Navbar from '../../components/shared/Navbar';
 
 const JobsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -37,85 +38,94 @@ const JobsPage = () => {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Jobs & Internships</h1>
-        <p className="text-gray-600">Find your next career opportunity</p>
+    <div className="flex min-h-screen">
+      <div className="flex-none">
+        <Navbar type="student" />
       </div>
+      <div className="flex-1 ml-64">
+        <div className="w-full bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50">
+          <div className="p-6 max-w-7xl mx-auto">
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold mb-2">Jobs & Internships</h1>
+              <p className="text-gray-600">Find your next career opportunity</p>
+            </div>
 
-      {/* Search and Filters */}
-      <div className="mb-8 space-y-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
-            type="text"
-            placeholder="Search jobs by title or company..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
-          />
-        </div>
+            {/* Search and Filters */}
+            <div className="mb-8 space-y-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search jobs by title or company..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                />
+              </div>
 
-        <div className="flex gap-4 overflow-x-auto pb-2">
-          {jobTypes.map(type => (
-            <button
-              key={type}
-              onClick={() => setSelectedType(type)}
-              className={`px-4 py-2 rounded-full whitespace-nowrap transition-all ${
-                selectedType === type
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              {type}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Jobs List */}
-      <div className="space-y-4">
-        {filteredJobs.map(job => (
-          <div key={job.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-start gap-4">
-              <img src={job.logo} alt={job.company} className="w-12 h-12 rounded-lg object-cover" />
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-xl font-semibold">{job.title}</h3>
-                  <span className="text-sm text-gray-500">{job.posted}</span>
-                </div>
-                
-                <div className="flex items-center gap-4 text-gray-600 text-sm mb-4">
-                  <div className="flex items-center">
-                    <Building className="w-4 h-4 mr-1" />
-                    {job.company}
-                  </div>
-                  <div className="flex items-center">
-                    <MapPin className="w-4 h-4 mr-1" />
-                    {job.location}
-                  </div>
-                  <div className="flex items-center">
-                    <DollarSign className="w-4 h-4 mr-1" />
-                    {job.salary}
-                  </div>
-                  <div className="flex items-center">
-                    <Clock className="w-4 h-4 mr-1" />
-                    {job.type}
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <button className="bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
-                    Apply Now
+              <div className="flex gap-4 overflow-x-auto pb-2">
+                {jobTypes.map(type => (
+                  <button
+                    key={type}
+                    onClick={() => setSelectedType(type)}
+                    className={`px-4 py-2 rounded-full whitespace-nowrap transition-all ${
+                      selectedType === type
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {type}
                   </button>
-                  <button className="border border-purple-600 text-purple-600 py-2 px-4 rounded-lg hover:bg-purple-50 transition-colors">
-                    Save Job
-                  </button>
-                </div>
+                ))}
               </div>
             </div>
+
+            {/* Jobs List */}
+            <div className="space-y-4">
+              {filteredJobs.map(job => (
+                <div key={job.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                  <div className="flex items-start gap-4">
+                    <img src={job.logo} alt={job.company} className="w-12 h-12 rounded-lg object-cover" />
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-xl font-semibold">{job.title}</h3>
+                        <span className="text-sm text-gray-500">{job.posted}</span>
+                      </div>
+                      
+                      <div className="flex items-center gap-4 text-gray-600 text-sm mb-4">
+                        <div className="flex items-center">
+                          <Building className="w-4 h-4 mr-1" />
+                          {job.company}
+                        </div>
+                        <div className="flex items-center">
+                          <MapPin className="w-4 h-4 mr-1" />
+                          {job.location}
+                        </div>
+                        <div className="flex items-center">
+                          <DollarSign className="w-4 h-4 mr-1" />
+                          {job.salary}
+                        </div>
+                        <div className="flex items-center">
+                          <Clock className="w-4 h-4 mr-1" />
+                          {job.type}
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button className="bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+                          Apply Now
+                        </button>
+                        <button className="border border-purple-600 text-purple-600 py-2 px-4 rounded-lg hover:bg-purple-50 transition-colors">
+                          Save Job
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );
