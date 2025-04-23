@@ -8,7 +8,6 @@ const validator = require('validator');
 const router = express.Router();
 
 // Register user
-
 router.post('/register', async (req, res) => {
   try {
     let {
@@ -98,7 +97,7 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // Create and save the user based on userType
+    // Create and save the user
     let user;
     if (userType === 'student') {
       user = new Student(userData);
@@ -107,6 +106,37 @@ router.post('/register', async (req, res) => {
     }
 
     await user.save();
+
+    // If the user is alumni, create a mentor record
+    if (userType === 'alumni') {
+      const Mentor = require('../models/mentor'); // Ensure path is correct
+
+      try {
+        const existingMentor = await Mentor.findById(user._id);
+        if (existingMentor) {
+          console.log("Mentor already exists with ID:", user._id);
+        } else {
+          const mentorData = {
+            _id: user._id,
+            name: `${firstName} ${lastName}`,
+            role: jobTitle,
+            company: currentCompany,
+            expertise: [industry],
+            rating: 0,
+            availability: "Available",
+            image: "",
+            sessions: 0
+          };
+
+          console.log("Saving new mentor:", mentorData);
+          const mentor = new Mentor(mentorData);
+          await mentor.save();
+        }
+      } catch (mentorError) {
+        console.error("Error saving mentor:", mentorError.message);
+        return res.status(400).json({ message: 'Failed to create mentor', error: mentorError.message });
+      }
+    }
 
     // Generate JWT token
     const token = jwt.sign(
@@ -119,20 +149,20 @@ router.post('/register', async (req, res) => {
       token,
       user: {
         id: user._id,
-        user_id: user.user_id, 
+        user_id: user.user_id,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
         role: user.role
       }
     });
-    
 
   } catch (error) {
-    console.error(error);
+    console.error("Server error during registration:", error);
     res.status(500).json({ message: error.message });
   }
 });
+
 
 router.post("/login", async (req, res) => {
   try {
@@ -157,7 +187,7 @@ router.post("/login", async (req, res) => {
 
     // Generate JWT
     const token = jwt.sign(
-      { userId: user._id, role: user.role },
+      { userId: user._id, role: user.role }, //
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
@@ -173,7 +203,9 @@ router.post("/login", async (req, res) => {
         name: `${user.firstName} ${user.lastName}`,
         email: user.email,
         role: user.role,
-        userType: user.userType
+        userType: user.userType,
+        studentId: user.studentId,
+        mentorId:user.alumniId 
       }
     });
   } catch (error) {

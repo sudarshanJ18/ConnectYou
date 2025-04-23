@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from "framer-motion";
 import Navbar from '../../components/shared/Navbar';
 import { Users, MessageSquare, Calendar } from 'lucide-react';
+import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -9,6 +11,35 @@ const cardVariants = {
 };
 
 const AlumniMentorship = () => {
+  const [requests, setRequests] = useState([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    const decoded = jwtDecode(token);
+    const mentorId = decoded.userId;
+
+    console.log("🔍 Mentor ID from token:", mentorId); // <-- Debugging line
+
+    axios.get(`http://localhost:5000/api/mentor/requests/${mentorId}`)
+      .then(res => {
+        console.log("✅ Fetched mentorship requests:", res.data.requests); // Optional: Log the response
+        setRequests(res.data.requests);
+      })
+      .catch(err => console.error("❌ Failed to fetch mentorship requests", err));
+  }, []);
+
+  const handleAccept = (requestId) => {
+    axios.patch(`http://localhost:5000/api/mentor/accept/${requestId}`)
+      .then(() => {
+        alert("✅ Request accepted!");
+        setRequests(prev => prev.filter(r => r._id !== requestId));
+      })
+      .catch(err => console.error("❌ Error accepting request", err));
+  };
+
+
   return (
     <div className="flex">
       {/* Sidebar */}
@@ -34,25 +65,32 @@ const AlumniMentorship = () => {
           variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
         >
           {/* Active Mentees */}
-          <motion.div variants={cardVariants} className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold mb-4">Active Mentees</h2>
-            <div className="space-y-4">
-              {[1, 2, 3].map((mentee) => (
-                <motion.div key={mentee} whileHover={{ scale: 1.02 }} className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg transition">
-                  <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                    <Users className="w-5 h-5 text-gray-600" />
-                  </div>
-                  <div>
-                    <p className="font-medium">Student {mentee}</p>
-                    <p className="text-sm text-gray-600">Computer Science</p>
-                  </div>
-                  <button className="ml-auto text-blue-600 hover:text-blue-700">
-                    <MessageSquare className="w-5 h-5" />
-                  </button>
-                </motion.div>
-              ))}
+<motion.div variants={cardVariants} className="bg-white p-6 rounded-lg shadow-md">
+  <h2 className="text-lg font-semibold mb-4">Active Mentees</h2>
+  <div className="space-y-4">
+    {requests.filter(req => req.status === 'accepted').length === 0 ? (
+      <p className="text-gray-600">No active mentees yet.</p>
+    ) : (
+      requests
+        .filter(req => req.status === 'accepted')
+        .map((req) => (
+          <motion.div key={req._id} whileHover={{ scale: 1.02 }} className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg transition">
+            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+              <Users className="w-5 h-5 text-gray-600" />
             </div>
+            <div>
+              <p className="font-medium">{req.studentName}</p>
+              <p className="text-sm text-gray-600">{req.studentEmail}</p>
+            </div>
+            <button className="ml-auto text-blue-600 hover:text-blue-700">
+              <MessageSquare className="w-5 h-5" />
+            </button>
           </motion.div>
+        ))
+    )}
+  </div>
+</motion.div>
+
 
           {/* Upcoming Sessions */}
           <motion.div variants={cardVariants} className="bg-white p-6 rounded-lg shadow-md">
@@ -90,6 +128,40 @@ const AlumniMentorship = () => {
               </motion.div>
             </div>
           </motion.div>
+
+          {/* Pending Requests */}
+<motion.div variants={cardVariants} className="bg-white p-6 rounded-lg shadow-md">
+  <h2 className="text-lg font-semibold mb-4">Pending Requests</h2>
+  {requests.filter(req => req.status === 'pending').length === 0 ? (
+    <p className="text-gray-600">No pending requests.</p>
+  ) : (
+    <div className="space-y-4">
+      {requests
+        .filter(req => req.status === 'pending')
+        .map((req) => (
+          <motion.div
+            key={req._id}
+            whileHover={{ scale: 1.02 }}
+            className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg transition"
+          >
+            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+              <Users className="w-5 h-5 text-gray-600" />
+            </div>
+            <div>
+              <p className="font-medium">{req.studentName}</p>
+              <p className="text-sm text-gray-600">{req.studentEmail}</p>
+            </div>
+            <button
+              className="ml-auto bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+              onClick={() => handleAccept(req._id)}
+            >
+              Accept
+            </button>
+          </motion.div>
+        ))}
+    </div>
+  )}
+</motion.div>
         </motion.div>
       </div>
     </div>

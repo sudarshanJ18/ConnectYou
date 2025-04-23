@@ -14,14 +14,18 @@ const authenticateUser = async (req, res, next) => {
     console.log("Decoded:", decoded); // Should show { userId, role }
 
     const user = await User.findById(decoded.userId); // ✅ use userId here
+    const student = await User.findById(decoded.studentId);
     if (!user) {
       return res.status(401).json({ message: 'User not found' });
     }
     req.token = token;
     req.user = {
       id: user._id,
-      role: user.role
+      role: user.role,
+      // studentId: decoded.studentId ,
+      // mentorId: decoded.alumniId 
     };
+   
 
     next();
   } catch (error) {

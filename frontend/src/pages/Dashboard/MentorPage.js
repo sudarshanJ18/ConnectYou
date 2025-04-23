@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import {jwtDecode} from "jwt-decode";
 import { motion } from "framer-motion";
 import { Users, Star, Calendar, MessageSquare } from "lucide-react";
 import Navbar from '../../components/shared/Navbar';
 
-// 🛠 MentorCard Component - Kept unchanged
 const MentorCard = ({ mentor, onRequestSession }) => (
   <motion.div
     initial={{ opacity: 0, scale: 0.9 }}
@@ -14,7 +14,7 @@ const MentorCard = ({ mentor, onRequestSession }) => (
   >
     <div className="relative">
       <img
-        src={`http://localhost:5000/${mentor.image}`}  // prepend the server URL to the image path
+        src={`http://localhost:5000/${mentor.image}`}
         alt={mentor.name}
         className="w-full h-48 object-cover rounded-t-lg transition-transform duration-300 hover:scale-110"
       />
@@ -30,20 +30,33 @@ const MentorCard = ({ mentor, onRequestSession }) => (
         <Users className="w-4 h-4 text-gray-500 mr-1" />
         <span>{mentor.sessions} sessions</span>
       </div>
+
+      {/* Conditional Buttons */}
       <div className="mt-4 flex gap-2">
-        <button
-          onClick={() => onRequestSession(mentor)}
-          className="flex-1 bg-purple-600 text-white px-4 py-2 rounded-lg transition-all duration-300 hover:bg-purple-700"
-        >
-          <Calendar className="w-4 h-4 mr-2 inline-block" />
-          Book Session
-        </button>
+        {mentor.requestStatus === "accepted" ? (
+          <div className="text-green-600 font-semibold w-full text-center py-2 border border-green-300 rounded-lg bg-green-50">
+            ✅ You are connected
+          </div>
+        ) : mentor.requestStatus === "pending" ? (
+          <div className="text-yellow-600 font-semibold w-full text-center py-2 border border-yellow-300 rounded-lg bg-yellow-50">
+            ⏳ Request Pending
+          </div>
+        ) : (
+          <button
+            onClick={() => onRequestSession(mentor)}
+            className="flex-1 bg-purple-600 text-white px-4 py-2 rounded-lg transition-all duration-300 hover:bg-purple-700"
+          >
+            <Calendar className="w-4 h-4 mr-2 inline-block" />
+            Connect
+          </button>
+        )}
         <button className="flex-1 border border-purple-600 text-purple-600 px-4 py-2 rounded-lg transition-all duration-300 hover:bg-purple-50">
           <MessageSquare className="w-4 h-4 mr-2 inline-block" />
           Message
         </button>
       </div>
     </div>
+
     <div className="px-6 py-4 bg-gradient-to-r from-purple-50 to-indigo-50">
       <div className="text-sm text-purple-600">
         <i className="fas fa-magic mr-2"></i>
@@ -53,39 +66,77 @@ const MentorCard = ({ mentor, onRequestSession }) => (
   </motion.div>
 );
 
-// 🏠 Enhanced Mentor Page
+
 const MentorPage = () => {
   const [mentors, setMentors] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [studentId, setStudentId] = useState(null);
 
   useEffect(() => {
-    // Set loading state
-    setIsLoading(true);
-    
-    // Fetch mentors data
-    axios.get("http://localhost:5000/api/mentor/")
-      .then(res => {
-        setMentors(res.data);
-        setIsLoading(false);
-      })
-      .catch(err => {
-        console.error("❌ Error fetching mentors:", err);
-        setIsLoading(false);
-      });
+    const token = localStorage.getItem("token");
+  if (!token) {
+    console.error("❌ No token found");
+    return;
+  }
+
+  try {
+    const decoded = jwtDecode(token);
+    setStudentId(decoded.id); // or decoded.studentId based on your backend
+  } catch (error) {
+    console.error("❌ Invalid token");
+    return;
+  }
+
+  axios.get("http://localhost:5000/api/mentor/", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then(res => setMentors(res.data))
+    .catch(err => console.error("❌ Error fetching mentors:", err));
   }, []);
 
-  const handleRequestSession = (mentor) => {
-    alert(`Session requested with ${mentor.name}!`);
-  };
+  // // import jwt_decode from 'jwt-decode';
+  // import jwtDecode from 'jwt-decode';
 
-  // Filter mentors based on search term
-  const filteredMentors = mentors.filter(mentor =>
-    mentor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (mentor.expertise && mentor.expertise.some(skill => 
-      skill.toLowerCase().includes(searchTerm.toLowerCase())
-    ))
-  );
+  // import jwtDecode from 'jwt-decode';
+
+  const handleRequestSession = (mentor) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert("Token not found. Please login again.");
+      return;
+    }
+  
+    let userId;
+    try {
+      const decodedToken = jwtDecode(token);
+      userId = decodedToken.userId;
+    } catch (err) {
+      alert("Invalid token. Please login again.");
+      return;
+    }
+  
+    if (!userId) {
+      alert("User ID not found. Please login again.");
+      return;
+    }
+  
+    console.log("Sending request to backend with:");
+    console.log("mentorId (URL):", mentor._id);
+    console.log("userId (Body):", userId);
+  
+    axios.post(`http://localhost:5000/api/mentor/request/${mentor._id}`, {
+      studentId: userId, // 📝 Still sending as studentId to match backend schema
+      mentorId: mentor._id // Optional if backend uses URL param
+    })
+      .then(res => alert(`✅ Connection request sent to ${mentor.name}`))
+      .catch(err => console.error("❌ Error requesting session:", err));
+  };
+  
+  
+  
+  
 
   return (
     <div className="flex min-h-screen">
@@ -106,9 +157,8 @@ const MentorPage = () => {
             <p className="text-lg text-gray-600 mb-6 text-center">
               Connect with alumni mentors based on your career goals and interests
             </p>
-
-            {/* 🔍 Search Input */}
-            <div className="relative max-w-2xl mx-auto mb-8">
+  
+            <div className="relative max-w-2xl mx-auto mb-10">
               <input
                 type="text"
                 placeholder="Search by name, expertise, or industry..."
@@ -118,8 +168,7 @@ const MentorPage = () => {
               />
               <i className="fas fa-search absolute right-6 top-1/2 transform -translate-y-1/2 text-purple-400 text-xl"></i>
             </div>
-
-            {/* 🎯 AI Matching Preferences */}
+  
             <div className="max-w-5xl mx-auto bg-white p-6 rounded-xl shadow-lg mb-8">
               <h2 className="text-2xl font-semibold mb-4 text-indigo-800">
                 AI Matching Preferences
@@ -152,47 +201,46 @@ const MentorPage = () => {
                 </div>
               </form>
             </div>
-
-            {/* 🧑‍🏫 Mentor List */}
+  
             <motion.div
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
               initial="hidden"
               animate="visible"
               variants={{
                 hidden: { opacity: 0, y: 20 },
-                visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.2 } }
+                visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.2 } },
               }}
             >
-              {isLoading ? (
-                // Loading state
-                <div className="col-span-3 flex justify-center items-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
-                </div>
-              ) : filteredMentors.length > 0 ? (
-                // Display mentors when available
-                filteredMentors.map(mentor => (
-                  <MentorCard 
-                    key={mentor._id} 
-                    mentor={mentor} 
-                    onRequestSession={handleRequestSession} 
-                  />
-                ))
+              {mentors.length > 0 ? (
+                mentors
+                  .filter(
+                    (mentor) =>
+                      mentor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      (mentor.expertise &&
+                        mentor.expertise.some((skill) =>
+                          skill.toLowerCase().includes(searchTerm.toLowerCase())
+                        ))
+                  )
+                  .map((mentor) => (
+                    <MentorCard
+                      key={mentor._id}
+                      mentor={mentor}
+                      onRequestSession={handleRequestSession}
+                    />
+                  ))
               ) : (
-                // No mentors found state
                 <div className="col-span-3 text-center py-12">
                   <p className="text-gray-500 text-lg">
-                    {mentors.length === 0 
-                      ? "No mentors available at the moment." 
-                      : "No mentors match your search criteria."}
+                    Loading mentors or no mentors available...
                   </p>
                 </div>
               )}
             </motion.div>
-          </div>
-        </div>
+          </div> {/* <-- Closing container */}
+        </div> {/* <-- Closing gradient background */}
       </div>
     </div>
   );
-};
+}
 
 export default MentorPage;

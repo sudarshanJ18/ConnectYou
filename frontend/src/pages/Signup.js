@@ -474,7 +474,7 @@ const Signup = memo(({ togglePage }) => {
                             touched={touched.yearOfStudy}
                             options={studyYears}
                           />
-                          <FormField
+                          {/* <FormField
                             label="Student ID"
                             name="studentId"
                             value={formData.studentId}
@@ -482,7 +482,7 @@ const Signup = memo(({ togglePage }) => {
                             onBlur={handleBlur}
                             error={errors.studentId}
                             touched={touched.studentId}
-                          />
+                          /> */}
                         </>
                       ) : (
                         <>

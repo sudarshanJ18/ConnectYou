@@ -1,14 +1,15 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const MentorSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  role: { type: String, required: true },
-  company: { type: String, required: true },
-  expertise: { type: [String], required: true },
-  rating: { type: Number, required: true },
-  availability: { type: String, required: true },
-  image: { type: String, required: true },
-  sessions: { type: Number, default: 0 },
+const mentorSchema = new mongoose.Schema({
+  name: String,
+  role: String,
+  company: String,
+  expertise: [String],
+  rating: { type: Number, default: 0 },
+  availability: { type: String, default: "Available" },
+  image: String,
+  sessions: { type: Number, default: 0 }
 });
 
-module.exports = mongoose.model("Mentor", MentorSchema);
+// Check if model is already compiled
+module.exports = mongoose.models.Mentor || mongoose.model('Mentor', mentorSchema);

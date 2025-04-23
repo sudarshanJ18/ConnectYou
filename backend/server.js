@@ -47,7 +47,7 @@ app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
         ? process.env.ALLOWED_ORIGINS?.split(',') 
         : '*', // Ensure you handle the CORS for both development and production
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE" , "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
 }));
