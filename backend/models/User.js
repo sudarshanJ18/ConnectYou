@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true, select: true },
     userType: { type: String, enum: ["student", "alumni"], required: true },
     role: { type: String, enum: ["student", "instructor", "admin"], default: "student" },
-    profile: { type: mongoose.Schema.Types.ObjectId, ref: 'Profiles' }
+    profile: { type: mongoose.Schema.Types.ObjectId, ref: 'Profile' }
   },
   { timestamps: true, discriminatorKey: 'userType' }
 );

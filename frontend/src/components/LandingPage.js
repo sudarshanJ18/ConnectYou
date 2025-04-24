@@ -7,6 +7,7 @@ import Overview from './Overview';
 import Features from './Features';
 import AlumniShowcase from './AlumniShowcase';
 import { ArrowRight } from 'lucide-react';
+import './LandingPage.css';
 
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
@@ -29,19 +30,19 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="landing-page">
       {/* Header */}
       <Header />
       
       {/* Banner */}
-      <div className="w-full">
+      <div className="banner-container">
         <Banner onExploreClick={handleExploreClick} />
       </div>
 
       {/* Overview Section */}
       <motion.section 
         {...fadeIn}
-        className="w-full py-16 px-4 md:px-8"
+        className="overview-section"
       >
         <Overview showCards={showCards} />
       </motion.section>
@@ -50,36 +51,36 @@ const LandingPage = () => {
       <motion.div 
         ref={featuresRef}
         {...fadeIn}
-        className="w-full bg-gray-50 py-16 px-4 md:px-8"
+        className="features-section"
       >
         <Features showCards={showCards} />
       </motion.div>
 
       {/* Alumni Showcase */}
-      <section className="w-full py-16 px-4 md:px-8">
+      <section className="alumni-section">
         <AlumniShowcase />
       </section>
 
       {/* Insights Section */}
-      <section className="w-full py-16 px-4 md:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
+      <section className="insights-section">
+        <div className="container">
           {/* First Insight */}
           <motion.div 
-            className="flex flex-col md:flex-row items-center gap-8 mb-16"
+            className="insight-card"
             whileHover={{ scale: 1.02 }}
           >
-            <div className="w-full md:w-1/2">
+            <div className="insight-image">
               <motion.img 
-                src="../assets/mentorship.jpg"
+                src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
                 alt="Mentorship and Support"
-                className="w-full max-w-lg mx-auto rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300"
+                className="rounded-image"
               />
             </div>
-            <div className="w-full md:w-1/2 space-y-4">
-              <h3 className="text-2xl font-bold text-gray-900">
+            <div className="insight-content">
+              <h3 className="insight-title">
                 How ConnectYou Helps Students
               </h3>
-              <p className="text-lg text-gray-600 leading-relaxed">
+              <p className="insight-text">
                 ConnectYou provides a platform for students to connect with alumni for mentorship and guidance. Whether you're
                 looking for advice on academic projects, career decisions, or personal development, our platform ensures you have
                 the support you need.
@@ -89,21 +90,21 @@ const LandingPage = () => {
 
           {/* Second Insight */}
           <motion.div 
-            className="flex flex-col md:flex-row-reverse items-center gap-8"
+            className="insight-card reverse"
             whileHover={{ scale: 1.02 }}
           >
-            <div className="w-full md:w-1/2">
+            <div className="insight-image">
               <motion.img 
-                src="../assets/job-insight.jpeg"
+                src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
                 alt="Job Market Insights"
-                className="w-full max-w-lg mx-auto rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300"
+                className="rounded-image"
               />
             </div>
-            <div className="w-full md:w-1/2 space-y-4">
-              <h3 className="text-2xl font-bold text-gray-900">
+            <div className="insight-content">
+              <h3 className="insight-title">
                 Get Job Market Insights
               </h3>
-              <p className="text-lg text-gray-600 leading-relaxed">
+              <p className="insight-text">
                 Stay ahead of the curve with real-time insights into the job market. Our platform provides access to job listings,
                 networking opportunities with professionals, and resources that help you stay competitive in the job market.
               </p>
@@ -113,21 +114,21 @@ const LandingPage = () => {
       </section>
 
       {/* Videos and Blogs Section */}
-      <section className="w-full py-16 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">
+      <section className="resources-section">
+        <div className="container">
+          <h2 className="section-title">
             Latest Videos and Blogs from ConnectYou
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="resources-grid">
             {/* Video Card */}
             <motion.div 
-              className="bg-white rounded-2xl shadow-lg overflow-hidden"
+              className="resource-card video-card"
               whileHover={{ y: -5 }}
             >
-              <div className="aspect-video">
+              <div className="video-container">
                 <iframe
-                  className="w-full h-full"
+                  className="video-frame"
                   src="https://www.youtube.com/embed/wzETdEyoPyU"
                   title="ConnectYou Overview Video"
                   allowFullScreen
@@ -150,21 +151,21 @@ const LandingPage = () => {
             ].map((blog, index) => (
               <motion.div
                 key={index}
-                className="bg-white rounded-2xl shadow-lg p-6 space-y-4"
+                className="resource-card blog-card"
                 whileHover={{ y: -5 }}
               >
-                <h3 className="text-xl font-bold text-gray-900">
+                <h3 className="blog-title">
                   {blog.title}
                 </h3>
-                <p className="text-gray-600">
+                <p className="blog-excerpt">
                   {blog.excerpt}
                 </p>
                 <motion.a
                   href={blog.link}
-                  className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
+                  className="read-more-link"
                   whileHover={{ x: 5 }}
                 >
-                  Read More <ArrowRight className="ml-2 h-4 w-4" />
+                  Read More <ArrowRight className="arrow-icon" />
                 </motion.a>
               </motion.div>
             ))}

@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Menu, X, GraduationCap } from "lucide-react";
-import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate
+import { useNavigate } from "react-router-dom";
+import "./Header.css";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { scrollY } = useScroll();
-  const navigate = useNavigate(); // ✅ Initialize navigate
+  const navigate = useNavigate();
 
   const headerBackground = useTransform(
     scrollY,
     [0, 50],
-    ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0.9)"]
+    ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0.95)"]
   );
 
   useEffect(() => {
@@ -23,46 +24,66 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleNavigation = (path) => {
+    navigate(path);
+    setIsOpen(false); // Close mobile menu after navigation
+  };
+
   return (
     <motion.header
       style={{ backgroundColor: headerBackground }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-shadow ${
-        isScrolled ? "shadow-md backdrop-blur-sm" : ""
-      }`}
+      className={`header ${isScrolled ? "scrolled" : ""}`}
     >
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+      <nav className="header-nav">
+        <div className="header-container">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex items-center"
+            className="header-logo"
           >
-            <GraduationCap className="h-8 w-8 text-blue-600" />
-            <span className="ml-2 text-xl font-bold text-gray-900">
-              ConnectYou
-            </span>
+            <GraduationCap className="logo-icon" />
+            <span className="logo-text">ConnectYou</span>
           </motion.div>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-8">
-            {/* ✅ Sign In Button with Navigation */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => navigate("/login")} // ✅ Navigate to /login
-              className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors"
-            >
-              Sign In
-            </motion.button>
+          <div className="desktop-menu">
+            <ul className="nav-links">
+              <li><a href="#features" className="nav-link">Features</a></li>
+              <li><a href="#alumni" className="nav-link">Alumni</a></li>
+              <li><a href="#resources" className="nav-link">Resources</a></li>
+            </ul>
+            <div className="auth-buttons">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleNavigation("/signup")}
+                className="signup-btn"
+              >
+                Sign Up
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleNavigation("/login")}
+                className="login-btn"
+              >
+                Sign In
+              </motion.button>
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
+          <div className="mobile-menu-button">
             <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-700 hover:text-blue-600 transition-colors"
+              onClick={toggleMenu}
+              className="menu-toggle"
+              aria-label={isOpen ? "Close menu" : "Open menu"}
             >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isOpen ? <X className="menu-icon" /> : <Menu className="menu-icon" />}
             </button>
           </div>
         </div>
@@ -71,13 +92,23 @@ const Header = () => {
         <motion.div
           initial={false}
           animate={{ height: isOpen ? "auto" : 0 }}
-          className={`md:hidden overflow-hidden ${isOpen ? "pb-4" : ""}`}
+          className="mobile-menu"
         >
-          <div className="space-y-2">
-            {/* ✅ Mobile Sign In Button with Navigation */}
+          <ul className="mobile-nav-links">
+            <li><a href="#features" className="mobile-nav-link" onClick={() => setIsOpen(false)}>Features</a></li>
+            <li><a href="#alumni" className="mobile-nav-link" onClick={() => setIsOpen(false)}>Alumni</a></li>
+            <li><a href="#resources" className="mobile-nav-link" onClick={() => setIsOpen(false)}>Resources</a></li>
+          </ul>
+          <div className="mobile-auth-buttons">
             <button
-              onClick={() => navigate("/login")} // ✅ Navigate to /login
-              className="w-full bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors"
+              onClick={() => handleNavigation("/signup")}
+              className="mobile-signup-btn"
+            >
+              Sign Up
+            </button>
+            <button
+              onClick={() => handleNavigation("/login")}
+              className="mobile-login-btn"
             >
               Sign In
             </button>

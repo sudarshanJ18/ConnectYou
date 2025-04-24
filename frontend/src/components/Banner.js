@@ -1,104 +1,193 @@
-import React from "react";
+
+import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ArrowDown } from "lucide-react";
+import "./Banner.css";
 
-interface BannerProps {
-  onExploreClick: () => void;
-}
-
-const Banner: React.FC<BannerProps> = ({ onExploreClick }) => {
-  const navigate = useNavigate(); // ✅ Initialize navigation
+/**
+ * Enhanced Banner component with advanced glassmorphism UI/UX
+ * @param {Object} props - Component props
+ * @param {Function} props.onExploreClick - Function to handle explore button click
+ * @returns {JSX.Element} Banner component
+ */
+const Banner = ({ onExploreClick }) => {
+  const navigate = useNavigate();
+  const bannerRef = useRef(null);
+  
+  // Create floating particles for enhanced visual effect
+  useEffect(() => {
+    if (!bannerRef.current) return;
+    
+    const banner = bannerRef.current;
+    const particles = [];
+    const particleCount = 5;
+    
+    // Remove any existing particles first
+    const existingParticles = banner.querySelectorAll('.floating-particle');
+    existingParticles.forEach(particle => particle.remove());
+    
+    // Create new particles
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.classList.add('floating-particle');
+      
+      // Random size between 30px and 80px
+      const size = Math.floor(Math.random() * 50) + 30;
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      
+      // Random position
+      particle.style.left = `${Math.random() * 100}%`;
+      particle.style.top = `${Math.random() * 100}%`;
+      
+      // Random opacity for varied glass effect
+      particle.style.opacity = (Math.random() * 0.5 + 0.3).toString();
+      
+      // Add to banner
+      banner.appendChild(particle);
+      particles.push(particle);
+      
+      // Simple CSS animation for floating effect
+      particle.style.animation = `float${i} ${Math.random() * 10 + 15}s ease-in-out infinite`;
+      
+      // Create unique keyframe animation for this particle
+      const keyframes = `
+        @keyframes float${i} {
+          0%, 100% {
+            transform: translate(0, 0) rotate(0deg);
+          }
+          33% {
+            transform: translate(${Math.random() * 80 - 40}px, ${Math.random() * 80 - 40}px) rotate(${Math.random() * 20}deg);
+          }
+          66% {
+            transform: translate(${Math.random() * 80 - 40}px, ${Math.random() * 80 - 40}px) rotate(${Math.random() * 20}deg);
+          }
+        }
+      `;
+      
+      const styleElement = document.createElement('style');
+      styleElement.innerHTML = keyframes;
+      document.head.appendChild(styleElement);
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      particles.forEach(particle => particle.remove());
+      document.querySelectorAll('style').forEach(style => {
+        if (style.innerHTML.includes('keyframes float')) {
+          style.remove();
+        }
+      });
+    };
+  }, []);
 
   return (
-    <div className="relative h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage:
-            "url(https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="absolute inset-0 bg-black opacity-50"></div>
+    <div className="banner-section" ref={bannerRef}>
+      {/* Subtle overlay instead of solid background */}
+      <div className="banner-overlay"></div>
+      
+      {/* Main content */}
+      <div className="content-wrapper">
+        {/* Text content with animations and glassmorphism */}
+        <motion.div
+          className="banner-content"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <h1 className="banner-heading">
+            Connect with Alumni,
+            <br />
+            <span className="highlight-text">Shape Your Future</span>
+          </h1>
+          
+          <p className="banner-description">
+            Join our community of students and alumni to unlock opportunities,
+            gain insights, and build lasting connections.
+          </p>
+          
+          {/* Call-to-action buttons */}
+          <div className="banner-buttons">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate("/signup")}
+              className="btn-primary"
+            >
+              Get Started
+            </motion.button>
+            
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onExploreClick}
+              className="btn-secondary"
+            >
+              Learn More
+            </motion.button>
+          </div>
+        </motion.div>
+        
+        {/* Enhanced glassmorphism decorative elements */}
+        <div className="glass-decorations">
+          <motion.div 
+            className="glass-circle"
+            animate={{ 
+              y: [0, -15, 0],
+              rotate: [0, 5, 0]
+            }}
+            transition={{ 
+              duration: 6,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div 
+            className="glass-square"
+            animate={{ 
+              y: [0, 15, 0],
+              rotate: [15, 25, 15]
+            }}
+            transition={{ 
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 0.5
+            }}
+          />
+          <motion.div 
+            className="glass-rectangle"
+            animate={{ 
+              y: [0, 10, 0],
+              rotate: [-10, -15, -10]
+            }}
+            transition={{ 
+              duration: 7,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1
+            }}
+          />
+        </div>
       </div>
-
-      {/* Content */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1 }}
-        className="relative z-10 text-center px-4 max-w-4xl"
-      >
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-          className="text-4xl md:text-6xl font-bold text-white mb-6"
+      
+      {/* Scroll indicator */}
+      <div className="explore-section">
+        <motion.button
+          onClick={onExploreClick}
+          animate={{ y: [0, 10, 0] }}
+          transition={{ 
+            duration: 2, 
+            repeat: Infinity, 
+            ease: "easeInOut" 
+          }}
+          className="explore-button"
         >
-          Connect with Alumni,
-          <br />
-          Shape Your Future
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.3 }}
-          className="text-xl text-gray-200 mb-8"
-        >
-          Join our community of students and alumni to unlock opportunities,
-          gain insights, and build lasting connections.
-        </motion.p>
-
-        {/* Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.6 }}
-          className="space-x-4"
-        >
-          {/* ✅ "Get Started" Button navigates to Signup */}
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => navigate("/signup")}
-            className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-medium hover:bg-blue-700 transition-all shadow-md"
-          >
-            Get Started
-          </motion.button>
-
-          {/* ✅ "Learn More" Button triggers Explore Click */}
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={onExploreClick}
-            className="bg-white text-blue-600 px-8 py-3 rounded-full text-lg font-medium hover:bg-gray-100 transition-all shadow-md"
-          >
-            Learn More
-          </motion.button>
-        </motion.div>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.9 }}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-        >
-          <motion.button
-            onClick={onExploreClick}
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            className="text-white flex flex-col items-center"
-          >
-            <span className="text-sm mb-2">Explore More</span>
-            <ArrowDown className="h-6 w-6" />
-          </motion.button>
-        </motion.div>
-      </motion.div>
+          <span>Explore More</span>
+          <ArrowDown className="arrow-icon" />
+        </motion.button>
+      </div>
     </div>
   );
 };

@@ -1,111 +1,292 @@
+
 .banner-section {
   position: relative;
-  height: 100vh; /* Adjust as needed */
+  height: 100vh;
   width: 100%;
-  background-size: cover;
-  background-position: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white; /* Adjust text color for contrast */
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  /* Darker gradient background */
+  background: linear-gradient(135deg, #7b7de9, #b57de9);
 }
 
-.banner-content {
-  text-align: left; /* Center text */
-  font-size: 80px;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
-  opacity: 0; /* Start hidden for slide-in effect */
-  transform: translateY(-20px); /* Start slightly above */
-  transition: opacity 0.5s ease, transform 0.5s ease; /* Transition for slide-in effect */
-  z-index: 1; /* Ensure content is above other elements */
-}
-
-.banner-content.slide-in {
-  opacity: 1; /* Fade in */
-  transform: translateY(0); /* Slide into place */
-}
-
-.explore-btn {
-  margin-top: 20px; /* Space between text and button */
-  padding: 10px 20px; /* Button padding */
-  border: none; /* Remove default border */
-  border-radius: 5px; /* Rounded corners */
-  cursor: pointer; /* Pointer on hover */
-  background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
-  color: white; /* Button text color */
-  font-size: 1em; /* Button font size */
-  transition: background-color 0.3s, transform 0.3s; /* Transition for hover effect */
-}
-
-.explore-btn:hover {
-  background-color: rgba(255, 255, 255, 0.8); /* Change background on hover */
-  color: darkblue; /* Change text color on hover */
-  transform: scale(1.05); /* Slightly enlarge button on hover */
-}
-
-.highlight {
-  color: lightblue; /* Customize color */
-}
-
-.highlight-2 {
-  color: red; /* Customize color */
-}
-
-/* Decorative Shape Styles */
-.decorative-shape {
-  position: relative; /* Positioning it absolutely in the banner */
-  right: 0; /* Align to the right */
-  top: 100%; /* Center vertically */
-  transform: translateY(-50%); /* Adjust for vertical centering */
-  width: 250px; /* Adjust width as needed */
-  height: 250px; /* Adjust height as needed */
-  background-color: rgba(255, 255, 255, 0.5); /* Shape background (white with some transparency) */
-  border-radius: 50%; /* Circular shape */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Add shadow for depth */
-  animation: bounce 2s infinite; /* Bounce animation */
-}
-
-.overlay {
+/* White header for the top 15% */
+.banner-section::before {
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+  width: 100%;
+  height: 12%;
+  background: white;
+  z-index: 0;
 }
 
-.connect-you-image {
-  position: absolute; /* Position the image absolutely */
-  bottom: 20px; /* Adjust based on desired position */
-  right: 20px; /* Adjust based on desired position */
-  width: 150px; /* Adjust size as needed */
-  border-radius: 10px; /* Optional: Rounded corners */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Shadow effect */
-  animation: slide-up 0.8s ease-out; /* Animation for entrance */
+/* Adjusted overlay for better contrast with darker background */
+.banner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Slightly increased opacity for better readability */
+  background: linear-gradient(135deg, rgba(68, 77, 228, 0.15), rgba(136, 55, 233, 0.15));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 0;
 }
 
-@keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
-      transform: translateY(-50%); /* Stay in center */
+/* Content container */
+.content-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1;
+}
+
+/* Vibrant left-side container */
+.banner-content {
+  max-width: 600px;
+  color: white;
+  z-index: 2;
+  padding: 40px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(163, 141, 247, 0.35));
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 20px;
+  border: 2px solid rgba(163, 141, 247, 0.7);
+  box-shadow: 0 8px 32px rgba(163, 141, 247, 0.5);
+}
+
+.banner-heading {
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.highlight-text {
+  color: #ffffff;
+  position: relative;
+  display: inline-block;
+}
+
+.highlight-text::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 2px;
+}
+
+.banner-description {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* Button styles */
+.banner-buttons {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-primary, .btn-secondary {
+  padding: 14px 32px;
+  border-radius: 50px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  outline: none;
+}
+
+.btn-primary {
+  background: rgba(86, 67, 228, 0.8);
+  color: white;
+  box-shadow: 0 4px 15px rgba(86, 67, 228, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-primary:hover {
+  background: rgba(86, 67, 228, 0.9);
+  box-shadow: 0 8px 25px rgba(86, 67, 228, 0.7);
+  transform: translateY(-3px);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  box-shadow: 0 4px 15px rgba(31, 38, 135, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 25px rgba(31, 38, 135, 0.2);
+  transform: translateY(-3px);
+}
+
+/* Vibrant glassmorphism decorative elements */
+.glass-decorations {
+  position: relative;
+  width: 400px;
+  height: 400px;
+}
+
+.glass-circle {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(163, 141, 247, 0.4), rgba(255, 255, 255, 0.3));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  top: -50px;
+  right: 40px;
+  box-shadow: 0 8px 32px rgba(163, 141, 247, 0.5);
+}
+
+.glass-square {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(163, 141, 247, 0.4), rgba(255, 255, 255, 0.3));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  bottom: 20px;
+  right: 90px;
+  box-shadow: 0 8px 32px rgba(163, 141, 247, 0.5);
+  transform: rotate(15deg);
+}
+
+.glass-rectangle {
+  position: absolute;
+  width: 150px;
+  height: 100px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(163, 141, 247, 0.4), rgba(255, 255, 255, 0.3));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  bottom: 120px;
+  right: 10px;
+  box-shadow: 0 8px 32px rgba(163, 141, 247, 0.5);
+  transform: rotate(-10deg);
+}
+
+/* Explore section */
+.explore-section {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.explore-button {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  outline: none;
+  cursor: pointer;
+  padding: 16px 32px;
+  border-radius: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(31, 38, 135, 0.15);
+}
+
+.explore-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(31, 38, 135, 0.25);
+}
+
+.arrow-icon {
+  height: 20px;
+  width: 20px;
+  margin-top: 8px;
+  color: white;
+}
+
+/* Vibrant floating particles */
+.floating-particle {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(163, 141, 247, 0.5), rgba(255, 255, 255, 0.4));
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(163, 141, 247, 0.5);
+  z-index: 0;
+}
+
+/* Responsive styling */
+@media (max-width: 1024px) {
+  .glass-decorations {
+    display: none;
   }
-  40% {
-      transform: translateY(-60%); /* Bounce up */
-  }
-  60% {
-      transform: translateY(-40%); /* Bounce back down */
+  
+  .banner-content {
+    margin: 0 auto;
   }
 }
 
-@keyframes slide-up {
-  from {
-      transform: translateY(20px);
-      opacity: 0;
+@media (max-width: 768px) {
+  .content-wrapper {
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 20px;
+    text-align: center;
   }
-  to {
-      transform: translateY(0);
-      opacity: 1;
+  
+  .banner-content {
+    text-align: center;
+    max-width: 100%;
+    padding: 30px;
+  }
+  
+  .banner-buttons {
+    justify-content: center;
+  }
+  
+  .banner-heading {
+    font-size: 3rem;
+  }
+  
+  .banner-description {
+    font-size: 1.125rem;
+  }
+  
+  .floating-particle {
+    display: none;
   }
 }
