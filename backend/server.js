@@ -8,6 +8,7 @@ const morgan = require("morgan");
 const http = require("http");
 const path = require('path');
 const app = express();
+const userRoutes = require('./routes/userRoutes');
 
 dotenv.config();
 
@@ -81,6 +82,7 @@ app.use('/api/chat', (req, res, next) => {
     req.io = io;  // Pass io instance to the request object for routes
     next();
 }, chatRoutes);  // Add chat routes
+app.use('/api/users', userRoutes);
 
 // Health check endpoint for service monitoring
 app.get("/health", (req, res) => {

@@ -184,6 +184,29 @@ router.post("/login", async (req, res) => {
 
 
 
+// Get users by role
+router.get('/by-role/:role', auth, async (req, res) => {
+  try {
+    const { role } = req.params;
+    
+    // Validate role parameter
+    if (!['student', 'alumni'].includes(role)) {
+      return res.status(400).json({ message: 'Invalid role. Must be student or alumni.' });
+    }
+
+    // Find users by userType, excluding the current user
+    const users = await User.find({
+      userType: role,
+      _id: { $ne: req.user.userId }
+    }).select('firstName lastName email userType avatar currentCompany jobTitle industry graduationYear');
+
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching users by role:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Get user profile
 router.get('/profile', auth, async (req, res) => {
   try {

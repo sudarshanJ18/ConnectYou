@@ -1,107 +1,62 @@
 const Message = require('../models/message');
-const { User } = require('../models/User');
+const Chat = require('../models/Chat');
 
-function chatSocket(io) {
+module.exports = (io) => {
+    // Store online users
+    const onlineUsers = new Map();
+
     io.on('connection', (socket) => {
-        console.log('✅ New user connected:', socket.id);
-        
-        // Join a room specific to the user by userId
+        console.log('User connected:', socket.id);
+
+        // Handle user joining
         socket.on('joinRoom', async ({ userId }) => {
-            if (!userId) {
-                socket.emit('error', { message: 'User ID is required to join a room' });
-                return;
-            }
-            
-            try {
-                // Verify user exists
-                const user = await User.findOne({ user_id: userId });
-                if (!user) {
-                    socket.emit('error', { message: 'User not found' });
-                    return;
-                }
-                
+            if (userId) {
                 socket.join(userId);
-                console.log(`${userId} joined their room`);
-                socket.emit('roomJoined', { userId, success: true });
-            } catch (error) {
-                console.error('Error joining room:', error);
-                socket.emit('error', { message: 'Failed to join room' });
+                onlineUsers.set(userId, socket.id);
+                console.log(`User ${userId} joined their room`);
             }
         });
 
-        // Listen for messages being sent
-        socket.on('sendMessage', async (data) => {
-            try {
-                const { sender, receiver, content } = data;
-                
-                if (!sender || !receiver || !content) {
-                    socket.emit('error', { message: 'Sender, receiver, and content are required' });
-                    return;
-                }
-                
-                // Create chatId from sorted user IDs for consistency
-                const users = [sender, receiver].sort();
-                const chatId = `${users[0]}_${users[1]}`;
-            
-                const newMessage = new Message({ 
-                    sender, 
-                    receiver, 
-                    content, 
-                    chatId 
-                });
-                
-                await newMessage.save();
-                
-                // Emit to both sender and receiver
-                io.to(receiver).emit('receiveMessage', newMessage);
-                io.to(sender).emit('messageSent', newMessage);
-                
-                console.log(`Message sent from ${sender} to ${receiver}`);
-            } catch (error) {
-                console.error('Error sending message:', error);
-                socket.emit('error', { message: 'Failed to send message' });
-            }
-        });
-        
-        // When user is typing
+        // Handle typing events
         socket.on('typing', ({ sender, receiver }) => {
-            if (sender && receiver) {
-                io.to(receiver).emit('userTyping', { sender });
-            }
-        });
-        
-        // When user stops typing
-        socket.on('stopTyping', ({ sender, receiver }) => {
-            if (sender && receiver) {
-                io.to(receiver).emit('userStopTyping', { sender });
-            }
+            io.to(receiver).emit('userTyping', { sender });
         });
 
-        // Mark messages as read
+        socket.on('stopTyping', ({ sender, receiver }) => {
+            io.to(receiver).emit('userStopTyping', { sender });
+        });
+
+        // Handle message read status
         socket.on('markAsRead', async ({ messageIds, userId }) => {
             try {
-                if (!messageIds || !messageIds.length) {
-                    socket.emit('error', { message: 'Message IDs are required' });
-                    return;
-                }
-                
                 await Message.updateMany(
-                    { _id: { $in: messageIds }, receiver: userId },
+                    { _id: { $in: messageIds } },
                     { $set: { read: true } }
                 );
                 
-                socket.emit('messagesMarkedAsRead', { messageIds });
+                // Notify sender that messages were read
+                const messages = await Message.find({ _id: { $in: messageIds } });
+                messages.forEach(msg => {
+                    io.to(msg.sender).emit('messageRead', {
+                        messageId: msg._id,
+                        chatId: msg.chatId
+                    });
+                });
             } catch (error) {
                 console.error('Error marking messages as read:', error);
-                socket.emit('error', { message: 'Failed to mark messages as read' });
             }
         });
 
-        // When a user disconnects
+        // Handle disconnection
         socket.on('disconnect', () => {
-            console.log('❌ User disconnected:', socket.id);
+            // Remove user from online users
+            for (const [userId, socketId] of onlineUsers.entries()) {
+                if (socketId === socket.id) {
+                    onlineUsers.delete(userId);
+                    break;
+                }
+            }
+            console.log('User disconnected:', socket.id);
         });
     });
-}
-
-module.exports = chatSocket;
+};
