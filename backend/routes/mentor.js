@@ -51,6 +51,43 @@ router.post("/", upload.single("image"), async (req, res) => {
   }
 });
 
+
+// PUT route to update a mentor by ID
+router.put("/:id", upload.single("image"), async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if mentor exists
+    const mentor = await Mentor.findById(id);
+    if (!mentor) {
+      return res.status(404).json({ error: "Mentor not found" });
+    }
+
+    const { name, role, company, expertise, rating, availability, sessions } = req.body;
+
+    // Update fields
+    if (name) mentor.name = name;
+    if (role) mentor.role = role;
+    if (company) mentor.company = company;
+    if (expertise) mentor.expertise = expertise.split(",");
+    if (rating) mentor.rating = rating;
+    if (availability) mentor.availability = availability;
+    if (sessions) mentor.sessions = sessions;
+    if (req.file) mentor.image = req.file.path; // Update image if new one uploaded
+
+    await mentor.save();
+
+    res.status(200).json({ message: "Mentor updated successfully", mentor });
+  } catch (err) {
+    console.error("❌ Error updating mentor:", err);
+    res.status(400).json({
+      error: "Failed to update mentor",
+      details: err.message
+    });
+  }
+});
+
+
 // // ✅ GET route to fetch all mentors
 // router.get("/", async (req, res) => {
 //   try {

@@ -28,6 +28,7 @@ const Navbar = ({ type = 'student' }) => {
     { name: "Profile", icon: <User />, path: "/dashboard/profile" }
   ] : [
     { name: "Dashboard", icon: <LineChart />, path: "/alumni" },
+    { name: "E-Learning", icon: <GraduationCap />, path: "/alumni/e-learning" },
     { name: "Mentorship", icon: <Users />, path: "/alumni/mentorship" },
     { name: "Job Postings", icon: <Briefcase />, path: "/alumni/job-postings" },
     { name: "Messages", icon: <MessageSquare />, path: "/alumni/messages", badge: 3 },

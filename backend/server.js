@@ -23,7 +23,7 @@ if (missingEnvVars.length > 0) {
     console.error('❌ Missing required environment variables:', missingEnvVars.join(', '));
     process.exit(1);
 }
-
+app.use('/uploads', express.static('uploads'))
 // Routes setup
 const profileRoutes = require('./routes/profile');
 const aiRoutes = require('./routes/ai');
@@ -46,9 +46,9 @@ app.use(morgan(process.env.NODE_ENV === 'development' ? 'dev' : 'combined'));
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
         ? process.env.ALLOWED_ORIGINS?.split(',') 
-        : '*', // Ensure you handle the CORS for both development and production
-    methods: ["GET", "POST", "PUT", "DELETE" , "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+        : '*',
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-auth-token"], // Add x-auth-token here
     credentials: true
 }));
 

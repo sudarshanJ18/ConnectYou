@@ -24,7 +24,7 @@ const courseSchema = new mongoose.Schema({
       'Web Development', 'Data Science', 'Cloud Computing', 
       'Mobile Development', 'DevOps', 'Career Skills', 
       'Industry Insights', 'Personal Development', 'Design', 
-      'Business', 'Marketing', 'Personal'
+      'Business', 'Marketing', 'Personal','Other'
     ]
   },
   instructor: {

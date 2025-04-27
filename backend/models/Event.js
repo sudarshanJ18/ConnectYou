@@ -6,6 +6,7 @@ const eventSchema = new mongoose.Schema({
   time: { type: String, required: true },
   location: { type: String, required: true },
   description: { type: String, required: true },
+  meetingLink: { type: String, required: false } // New field for meeting/external link
 });
 
 const Event = mongoose.model('Event', eventSchema);

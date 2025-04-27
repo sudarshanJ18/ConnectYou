@@ -18,6 +18,7 @@ const MentorCard = ({ mentor, onRequestSession }) => (
         alt={mentor.name}
         className="w-full h-48 object-cover rounded-t-lg transition-transform duration-300 hover:scale-110"
       />
+      
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
     </div>
     <div className="p-6">
@@ -57,12 +58,12 @@ const MentorCard = ({ mentor, onRequestSession }) => (
       </div>
     </div>
 
-    <div className="px-6 py-4 bg-gradient-to-r from-purple-50 to-indigo-50">
+    {/* <div className="px-6 py-4 bg-gradient-to-r from-purple-50 to-indigo-50">
       <div className="text-sm text-purple-600">
         <i className="fas fa-magic mr-2"></i>
         AI Match Score: <span className="font-bold">98%</span>
       </div>
-    </div>
+    </div> */}
   </motion.div>
 );
 

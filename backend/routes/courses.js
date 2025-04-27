@@ -1,8 +1,102 @@
-const express = require('express');
-const Course = require('../models/Course');
-const auth = require('../middleware/auth');
-
+const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+const path = require("path");
+const Course = require("../models/course");
+const auth = require("../middleware/auth");
+
+// Multer setup for thumbnail upload
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage });
+
+// Create a new course - allowing alumni, admin, and instructor roles
+router.post("/", auth, upload.single("thumbnail"), async (req, res) => {
+  try {
+    const {
+      title, description, category, duration,
+      level, price, tags, isPublished, modules
+    } = req.body;
+
+    // Check if user has appropriate permissions
+    if (!req.user || !["admin", "instructor", "alumni"].includes(req.user.role)) {
+      return res.status(403).json({ message: "Unauthorized access: Only admins, instructors, or alumni allowed" });
+    }
+
+    const newCourse = new Course({
+      title,
+      description,
+      category,
+      instructor: req.user.id,
+      duration,
+      level,
+      thumbnail: req.file ? req.file.path : null,
+      price,
+      modules: modules ? JSON.parse(modules) : [],
+      tags: tags ? tags.split(",") : [],
+      isPublished: isPublished === "true"
+    });
+
+    const course = await newCourse.save();
+    console.log("✅ Course created:", course.title);
+    res.status(201).json(course);
+  } catch (error) {
+    console.error("❌ Error creating course:", error.message);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+// PUT route to update a course
+router.put("/:id", auth, upload.single("thumbnail"), async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // Authorization check
+    if (
+      course.instructor.toString() !== req.user.id.toString() &&
+      !["admin", "alumni" , "instructor"].includes(req.user.role)
+    ) {
+      return res.status(403).json({ message: "Unauthorized to update this course" });
+    }
+
+    // Update fields
+    const {
+      title, description, category, duration,
+      level, price, tags, isPublished
+    } = req.body;
+
+    if (title) course.title = title;
+    if (description) course.description = description;
+    if (category) course.category = category;
+    if (duration) course.duration = duration;
+    if (level) course.level = level;
+    if (price) course.price = price;
+    if (tags) course.tags = tags.split(",");
+    if (typeof isPublished !== "undefined") course.isPublished = isPublished;
+
+    if (req.file) {
+      course.thumbnail = req.file.path;
+    }
+
+    course.updatedAt = Date.now();
+    await course.save();
+
+    res.status(200).json({ message: "Course updated successfully", course });
+  } catch (error) {
+    console.error("❌ Error updating course:", error);
+    res.status(500).json({ message: error.message });
+  }
+});
 
 // Get all courses
 router.get('/', async (req, res) => {
@@ -47,42 +141,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Create a new course - allowing alumni and admin roles
-router.post('/', auth, async (req, res) => {
-  try {
-    const {
-      title, description, category, duration,
-      level, thumbnail, price, modules, tags, isPublished
-    } = req.body;
 
-    // Check if user has appropriate permissions (admin or alumni)
-    if (!req.user || !["admin", "instructor", "alumni"].includes(req.user.role)) {
-      return res.status(403).json({ message: "Unauthorized access: Only admins, instructors, or alumni allowed" });
-    }
-    
-
-
-    const newCourse = new Course({
-      title,
-      description,
-      category,
-      instructor: req.user.id,
-      duration,
-      level,
-      thumbnail,
-      price,
-      modules: modules || [],
-      tags: tags || [],
-      isPublished: isPublished || false
-    });
-
-    const course = await newCourse.save();
-    console.log("Saved course:", JSON.stringify(course.modules, null, 2));
-    res.status(201).json(course);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
 
 // Add/update modules to a course
 router.put('/:id/modules', auth, async (req, res) => {

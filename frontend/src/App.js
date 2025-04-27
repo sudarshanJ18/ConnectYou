@@ -20,6 +20,7 @@ import EventsPage from "./pages/Dashboard/EventsPage";
 
 // Alumni Dashboard Pages
 import AlumniDashboard from './pages/Dashboard/AlumniDashboard';
+import AlumniELearningPage from './pages/Dashboard/AlumniELearningPage';
 import AlumniMentorship from './pages/Dashboard/AlumniMentorship';
 import AlumniJobPostings from './pages/Dashboard/AlumniJobPostings';
 import AlumniKnowledge from './pages/Dashboard/AlumniKnowledge';
@@ -60,6 +61,7 @@ const AlumniLayout = () => {
       <div className="flex-1 p-6">
         <Routes>
           <Route path="/" element={<AlumniDashboard />} />
+          <Route path="/e-learning" element={<AlumniELearningPage />} />
           <Route path="/mentorship" element={<AlumniMentorship />} />
           <Route path="/job-postings" element={<AlumniJobPostings />} />
           <Route path="/knowledge" element={<AlumniKnowledge />} />

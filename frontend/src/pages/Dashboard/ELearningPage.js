@@ -98,7 +98,7 @@ const CourseCard = ({ course, onEnroll, recommended = false }) => {
     <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-lg transition-shadow">
       <div className="relative">
         <img 
-          src={course.image}
+          src={`http://localhost:5000/${course.thumbnail}`}
           alt={course.title} 
           className="w-full h-48 object-cover" 
         />
@@ -221,7 +221,7 @@ const ELearningPage = () => {
         setLoading(true);
   
         // Fetching courses
-        const coursesResponse = await fetch('http://localhost:5000/api/courses/');
+        const coursesResponse = await fetch('http://localhost:5000/api/courses');
         if (!coursesResponse.ok) {
           throw new Error('Failed to fetch courses');
         }
@@ -230,7 +230,7 @@ const ELearningPage = () => {
         setCourses(coursesData); // assuming API returns array directly
   
         // Fetching course recommendations
-        const recommendationsResponse = await fetch('http://localhost:5000/api/courses/');
+        const recommendationsResponse = await fetch('http://localhost:5000/api/courses');
         if (!recommendationsResponse.ok) {
           throw new Error('Failed to fetch recommendations');
         }

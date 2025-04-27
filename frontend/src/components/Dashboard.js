@@ -1,349 +1,589 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Bell, MessageSquare, LogOut, ChevronRight, User, BookOpen, 
-  Briefcase, Calendar, Users, HelpCircle, LineChart, GraduationCap, 
-  Play, Book, Award, Clock, MapPin
-} from "lucide-react";
-import { 
-  Routes, 
-  Route, 
-  Link, 
-  Navigate 
-} from "react-router-dom";
-import StudentNavbar from '../components/shared/Navbar';
-
-// Import page components
-import AIAssistantPage from "../pages/Dashboard/AIAssistantPage";
-import ELearningPage from "../pages/Dashboard/ELearningPage";
-import JobsPage from "../pages/Dashboard/JobsPage";
-import MentorPage from "../pages/Dashboard/MentorPage";
-import MessagesPage from "../pages/Dashboard/MessagesPage";
-import OpenProjectsPage from "../pages/Dashboard/OpenProjectsPage";
-import WorkshopsPage from "../pages/Dashboard/WorkshopsPage";
-import ProfilePage from "../pages/Dashboard/ProfilePage";
-import StudentProfilePage from "../pages/Dashboard/StudentProfilePage";
-
 import { useNavigate } from 'react-router-dom';
+import { 
+  BookOpen, 
+  Calendar, 
+  Briefcase, 
+  Users, 
+  Bell, 
+  Search,
+  ChevronRight,
+  Star,
+  Clock,
+  MapPin,
+  Building,
+  Play,
+  TrendingUp,
+  BarChart,
+  Award,
+  LayoutDashboard,
+  MessageSquare
+} from 'lucide-react';
+import Navbar from './shared/Navbar';
 
-// DashboardContent and other page components remain unchanged...
-// Dashboard Content Component
-const DashboardContent = () => {
-  const notifications = [
-    { id: 1, text: 'New mentor match available!', type: 'success' },
-    { id: 2, text: 'Upcoming workshop: Advanced React', type: 'info' },
-    { id: 3, text: 'Career fair next week', type: 'warning' }
-  ];
-
-  const featuredServices = [
-    {
-      title: 'Mentorship Matching',
-      description: 'Connect with industry professionals who can guide your career journey',
-      icon: <Users className="w-8 h-8" />,
-      action: 'Find Mentor'
-    },
-    {
-      title: 'Job Opportunities',
-      description: 'Explore latest positions matching your skills and interests',
-      icon: <Briefcase className="w-8 h-8" />,
-      action: 'View Jobs'
-    },
-    {
-      title: 'Skill Workshops',
-      description: 'Join interactive sessions to enhance your professional skills',
-      icon: <BookOpen className="w-8 h-8" />,
-      action: 'Browse Workshops'
-    }
-  ];
-
-  const courses = [
-    {
-      title: 'Advanced React Development',
-      progress: 75,
-      duration: '8 weeks',
-      instructor: 'Dr. Sarah Chen',
-      nextLesson: 'State Management with Redux',
-      image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=800&q=80'
-    },
-    {
-      title: 'Cloud Architecture Fundamentals',
-      progress: 45,
-      duration: '10 weeks',
-      instructor: 'Mark Rodriguez',
-      nextLesson: 'Microservices Architecture',
-      image: 'https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?auto=format&fit=crop&w=800&q=80'
-    },
-    {
-      title: 'Data Science Masterclass',
-      progress: 30,
-      duration: '12 weeks',
-      instructor: 'Dr. Emily Watson',
-      nextLesson: 'Machine Learning Basics',
-      image: 'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?auto=format&fit=crop&w=800&q=80'
-    }
-  ];
-
-  const instructors = [
-    {
-      name: 'Dr. Sarah Chen',
-      role: 'AI Research Lead',
-      company: 'TechCorp',
-      expertise: 'Machine Learning, Neural Networks',
-      availability: 'Available for mentoring',
-      image: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=800&q=80'
-    },
-    {
-      name: 'Mark Rodriguez',
-      role: 'Senior Software Architect',
-      company: 'GlobalTech',
-      expertise: 'System Design, Cloud Architecture',
-      availability: 'Available for workshops',
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=800&q=80'
-    },
-    {
-      name: 'Dr. Emily Watson',
-      role: 'Data Science Director',
-      company: 'DataCo',
-      expertise: 'Big Data, Analytics',
-      availability: 'Available for project review',
-      image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=800&q=80'
-    }
-  ];
-
-  return (
-    <>
-      {/* Notifications Section */}
-      <div className="space-y-2 mb-6">
-        {notifications.map((notification, index) => (
-          <div 
-            key={notification.id} 
-            className={`p-4 rounded-lg transform transition-all duration-300 hover:scale-[1.02] ${
-              notification.type === 'success' ? 'bg-green-50 text-green-700' :
-              notification.type === 'info' ? 'bg-blue-50 text-blue-700' :
-              'bg-yellow-50 text-yellow-700'
-            }`}
-            style={{ animationDelay: `${index * 150}ms` }}
-          >
-            {notification.text}
-          </div>
-        ))}
-      </div>
-
-      {/* Courses Section */}
-      <h3 className="text-lg font-semibold mb-4">Your Learning Journey</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {courses.map((course, index) => (
-          <div 
-            key={course.title} 
-            className="bg-white rounded-lg shadow-md overflow-hidden transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
-            style={{ animationDelay: `${index * 200}ms` }}
-          >
-            <img src={course.image} alt={course.title} className="w-full h-40 object-cover" />
-            <div className="p-6">
-              <h4 className="text-lg font-semibold mb-2">{course.title}</h4>
-              <p className="text-sm text-gray-600 mb-4">Instructor: {course.instructor}</p>
-              
-              <div className="relative pt-1">
-                <div className="flex mb-2 items-center justify-between">
-                  <span className="text-xs font-semibold inline-block text-purple-600">
-                    Progress: {course.progress}%
-                  </span>
-                  <span className="text-xs font-semibold inline-block text-purple-600">
-                    {course.duration}
-                  </span>
-                </div>
-                <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-purple-200">
-                  <div 
-                    style={{ width: `${course.progress}%` }}
-                    className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-purple-600 transition-all duration-500"
-                  ></div>
-                </div>
-              </div>
-
-              <p className="text-sm text-gray-600 mb-4">Next: {course.nextLesson}</p>
-              <button className="w-full bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center">
-                <Play className="w-4 h-4 mr-2" />
-                Continue Learning
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Featured Services and Instructors sections remain unchanged... */}
-      {/* Featured Services Section */}
-      <h3 className="text-lg font-semibold mb-4">Featured Services</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {featuredServices.map((service, index) => (
-          <div 
-            key={service.title} 
-            className="bg-white rounded-lg shadow-md p-6 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
-            style={{ animationDelay: `${index * 150}ms` }}
-          >
-            <div className="mb-2">{service.icon}</div>
-            <h4 className="text-lg font-semibold mb-2">{service.title}</h4>
-            <p className="text-gray-600 mb-4">{service.description}</p>
-            <button className="w-full bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center">
-              {service.action}
-              <ChevronRight className="h-4 w-4 ml-2" />
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {/* Instructors Section */}
-      <h3 className="text-lg font-semibold mb-4">Featured Instructors</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {instructors.map((instructor, index) => (
-          <div 
-            key={instructor.name} 
-            className="bg-white rounded-lg shadow-md overflow-hidden transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
-            style={{ animationDelay: `${index * 150}ms` }}
-          >
-            <img src={instructor.image} alt={instructor.name} className="w-full h-48 object-cover" />
-            <div className="p-6">
-              <h4 className="text-lg font-semibold">{instructor.name}</h4>
-              <p className="text-gray-600">{instructor.role} at {instructor.company}</p>
-              <div className="flex items-center mt-4">
-                <Award className="w-4 h-4 text-purple-600 mr-2" />
-                <p className="text-sm text-gray-600">{instructor.expertise}</p>
-              </div>
-              <div className="flex items-center mt-2">
-                <Book className="w-4 h-4 text-green-600 mr-2" />
-                <p className="text-sm text-green-600">{instructor.availability}</p>
-              </div>
-              <button className="w-full mt-4 border border-purple-600 text-purple-600 py-2 px-4 rounded hover:bg-purple-50 transition-colors duration-200">
-                View Profile
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
-  );
-};
-
-// Events Page Component remains unchanged...
-const EventsPage = () => {
-  const events = [
-    {
-      title: "Tech Career Fair 2025",
-      date: "March 15, 2025",
-      time: "10:00 AM - 4:00 PM",
-      location: "Virtual Event",
-      description: "Connect with top tech companies and explore career opportunities."
-    },
-    {
-      title: "Web Development Workshop",
-      date: "March 20, 2025",
-      time: "2:00 PM - 5:00 PM",
-      location: "Online",
-      description: "Learn modern web development practices and tools."
-    }
-  ];
-
-  return (
-    <div className="max-w-6xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6">Upcoming Events</h2>
-      <div className="grid gap-6">
-        {events.map((event) => (
-          <div key={event.title} className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-xl font-semibold mb-2">{event.title}</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <p className="text-gray-600"><Calendar className="inline w-4 h-4 mr-2" />{event.date}</p>
-                <p className="text-gray-600"><Clock className="inline w-4 h-4 mr-2" />{event.time}</p>
-              </div>
-              <div>
-                <p className="text-gray-600"><MapPin className="inline w-4 h-4 mr-2" />{event.location}</p>
-              </div>
-            </div>
-            <p className="text-gray-700">{event.description}</p>
-            <button className="mt-4 bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition-colors duration-200">
-              Register Now
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Main Dashboard Component - Enhanced to fix layout issues
 const Dashboard = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [userName, setUserName] = useState('');
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [jobs, setJobs] = useState([]);
+  const [mentors, setMentors] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [userName, setUserName] = useState('');
+  const [stats, setStats] = useState({
+    coursesCompleted: 5,
+    eventsAttended: 3,
+    jobsApplied: 8,
+    mentorSessions: 2
+  });
+
+  const [chatbotOpen, setChatbotOpen] = useState(false);
 
   useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        // Get the auth token from localStorage
+        const token = localStorage.getItem('token');
+        
+        // Set up headers with authentication token
+        const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // Use Authorization header with Bearer prefix
+        };
+  
+        // Fetch data for all sections in parallel, including auth headers for protected routes
+        const [coursesRes, eventsRes, jobsRes, mentorsRes, notificationsRes] = await Promise.all([
+          fetch('http://localhost:5000/api/courses'),
+          fetch('http://localhost:5000/api/events'),
+          fetch('http://localhost:5000/api/jobs'),
+          fetch('http://localhost:5000/api/mentor', { headers }), // Add auth headers here
+          fetch('http://localhost:5000/api/notifications')
+        ]);
+  
+        // Parse all responses
+        const coursesData = await coursesRes.json();
+        const eventsData = await eventsRes.json();
+        const jobsData = await jobsRes.json();
+        
+        // Handle mentor data with proper error checking
+        let mentorsData = [];
+        if (mentorsRes.ok) {
+          mentorsData = await mentorsRes.json();
+        } else {
+          console.error('Error fetching mentors:', mentorsRes.status);
+        }
+        
+        // Handle notifications separately as it might not exist yet
+        let notificationsData = [];
+        if (notificationsRes.ok) {
+          notificationsData = await notificationsRes.json();
+        }
+  
+        // Set state with fetched data
+        setCourses(coursesData.slice(0, 6));
+        setEvents(eventsData.slice(0, 3));
+        setJobs(jobsData.slice(0, 5));
+        setMentors(mentorsData.slice(0, 3));
+        setNotifications(notificationsData);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        // Handle gracefully - we'll just display placeholders
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchDashboardData();
+    
+    // Get user name from localStorage
     const storedName = localStorage.getItem('userName');
     if (storedName) {
       setUserName(storedName);
     }
-    
-    const timer = setTimeout(() => setIsLoading(false), 1000);
-    
-    return () => clearTimeout(timer);
   }, []);
 
-  if (isLoading) {
+  // Format date for events
+  const formatDate = (dateString) => {
+    const options = { month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  // Check if an event is upcoming
+  const isUpcoming = (dateString) => {
+    const eventDate = new Date(dateString);
+    const today = new Date();
+    return eventDate >= today;
+  };
+
+  // Toggle chatbot
+  const toggleChatbot = () => {
+    setChatbotOpen(!chatbotOpen);
+  };
+
+  if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gray-100">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-purple-600"></div>
+      <div className="flex min-h-screen">
+        <div className="flex-none">
+          <Navbar type="student" />
+        </div>
+        <div className="flex-1 ml-64">
+          <div className="p-6">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="h-32 bg-gray-200 rounded-lg"></div>
+                ))}
+              </div>
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-64 bg-gray-200 rounded-lg mb-6"></div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar/Navbar - Fixed position */}
-      <div className="fixed inset-y-0 left-0 z-30">
-        <StudentNavbar />
+    <div className="flex min-h-screen bg-gray-50">
+      <div className="flex-none">
+        <Navbar type="student" />
+      </div>
+      <div className="flex-1 ml-64">
+        {/* Header with welcome and search */}
+        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold mb-1">Welcome back, {userName || 'Student'}!</h1>
+                <p className="text-purple-100">Your learning journey continues today</p>
+              </div>
+              <div className="relative max-w-md w-full">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search courses, events, jobs..."
+                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent text-white placeholder-white/60"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          {/* Stats cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="bg-white rounded-lg shadow p-6 flex items-center">
+              <div className="rounded-full bg-purple-100 p-3 mr-4">
+                <BookOpen className="h-6 w-6 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="text-gray-500 text-sm">Courses Completed</h3>
+                <p className="text-2xl font-bold"> 0</p>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow p-6 flex items-center">
+              <div className="rounded-full bg-blue-100 p-3 mr-4">
+                <Calendar className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-gray-500 text-sm">Events Attended</h3>
+                <p className="text-2xl font-bold">0</p>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow p-6 flex items-center">
+              <div className="rounded-full bg-green-100 p-3 mr-4">
+                <Briefcase className="h-6 w-6 text-green-600" />
+              </div>
+              <div>
+                <h3 className="text-gray-500 text-sm">Jobs Applied</h3>
+                <p className="text-2xl font-bold">0</p>
+              </div>
+            </div>
+            <div className="bg-white rounded-lg shadow p-6 flex items-center">
+              <div className="rounded-full bg-amber-100 p-3 mr-4">
+                <Users className="h-6 w-6 text-amber-600" />
+              </div>
+              <div>
+                <h3 className="text-gray-500 text-sm">Mentor Sessions</h3>
+                <p className="text-2xl font-bold">0</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Learning Progress */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            {/* Current Courses */}
+            <div className="lg:col-span-2 bg-white rounded-lg shadow">
+              <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h2 className="text-lg font-semibold">Your Courses</h2>
+                <button 
+                  onClick={() => navigate('/dashboard/e-learning')}
+                  className="text-purple-600 hover:text-purple-800 text-sm flex items-center"
+                >
+                  View all courses
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                </button>
+              </div>
+              <div className="p-6">
+                {courses.length > 0 ? (
+                  <div className="space-y-4">
+                    {courses.slice(0, 3).map(course => (
+                      <div key={course.id} className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
+                        <div className="w-16 h-16 flex-shrink-0">
+                          <img 
+                            src={`http://localhost:5000/${course.thumbnail}`}
+                            alt={course.title} 
+                            className="w-full h-full object-cover rounded-md"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-medium px-2 py-1 rounded-full bg-purple-100 text-purple-800">{course.category}</span>
+                            <div className="flex items-center text-sm text-gray-500">
+                              <Clock className="w-3 h-3 mr-1" />
+                              {course.duration}
+                            </div>
+                          </div>
+                          <h3 className="mt-1 text-base font-medium text-gray-900 truncate">{course.title}</h3>
+                        </div>
+                        <button className="flex-shrink-0 bg-purple-600 text-white p-2 rounded-full hover:bg-purple-700 transition-colors">
+                          <Play className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-10">
+                    <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-500">You haven't enrolled in any courses yet</p>
+                    <button 
+                      onClick={() => navigate('/dashboard/e-learning')}
+                      className="mt-3 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                    >
+                      Browse Courses
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Learning Stats */}
+            <div className="bg-white rounded-lg shadow">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-lg font-semibold">Learning Activity</h2>
+              </div>
+              <div className="p-6">
+                <div className="mb-6">
+                  <h3 className="text-sm font-medium text-gray-500 mb-2">Weekly Progress</h3>
+                  <div className="flex items-center gap-1 h-20">
+                    {/* Simple bar chart representation */}
+                    {[40, 25, 60, 35, 80, 55, 30].map((height, index) => (
+                      <div key={index} className="flex-1 flex items-end h-full">
+                        <div 
+                          className="w-full bg-purple-600 rounded-t-sm" 
+                          style={{ height: `${height}%` }}
+                        ></div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-between mt-2 text-xs text-gray-500">
+                    <span>Mon</span>
+                    <span>Wed</span>
+                    <span>Fri</span>
+                    <span>Sun</span>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center">
+                    <div className="rounded-full p-2 bg-purple-100 mr-3">
+                      <TrendingUp className="h-5 w-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium">0 hrs</div>
+                      <div className="text-xs text-gray-500">This week</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="rounded-full p-2 bg-green-100 mr-3">
+                      <BarChart className="h-5 w-5 text-green-600" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium">+0% growth</div>
+                      <div className="text-xs text-gray-500">vs last week</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="rounded-full p-2 bg-amber-100 mr-3">
+                      <Award className="h-5 w-5 text-amber-600" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium">0 certificates</div>
+                      <div className="text-xs text-gray-500">Earned this month</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Upcoming Events and Jobs */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            {/* Upcoming Events */}
+            <div className="bg-white rounded-lg shadow">
+              <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h2 className="text-lg font-semibold">Upcoming Events</h2>
+                <button 
+                  onClick={() => navigate('/dashboard/events')}
+                  className="text-purple-600 hover:text-purple-800 text-sm flex items-center"
+                >
+                  View all
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                </button>
+              </div>
+              <div className="p-4">
+                {events.length > 0 ? (
+                  <div className="space-y-4">
+                    {events.filter(event => isUpcoming(event.date)).slice(0, 3).map(event => (
+                      <div key={event._id} className="flex items-start p-2 hover:bg-gray-50 rounded-lg transition-colors">
+                        <div className="bg-purple-50 p-3 rounded-lg text-center mr-4 w-16">
+                          <div className="text-lg font-bold text-purple-600">
+                            {new Date(event.date).getDate()}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {new Date(event.date).toLocaleString('default', { month: 'short' })}
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-gray-900 truncate">{event.title}</h3>
+                          <div className="flex items-center mt-1 text-sm text-gray-500">
+                            <Clock className="w-3 h-3 mr-1" />
+                            {event.time}
+                          </div>
+                          <div className="flex items-center mt-1 text-sm text-gray-500">
+                            <MapPin className="w-3 h-3 mr-1" />
+                            {event.location}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Calendar className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                    <p className="text-gray-500">No upcoming events</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Recent Jobs */}
+            <div className="lg:col-span-2 bg-white rounded-lg shadow">
+              <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h2 className="text-lg font-semibold">Recent Job Postings</h2>
+                <button 
+                  onClick={() => navigate('/dashboard/jobs')}
+                  className="text-purple-600 hover:text-purple-800 text-sm flex items-center"
+                >
+                  View all jobs
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                </button>
+              </div>
+              <div className="p-4">
+                {jobs.length > 0 ? (
+                  <div className="space-y-3">
+                    {jobs.slice(0, 5).map(job => (
+                      <div key={job.id} className="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
+                        <div className="w-12 h-12 flex-shrink-0 mr-4">
+                          <div className="bg-gray-50 p-2 rounded-lg flex items-center justify-center h-full">
+                            <img src={job.logo} alt={job.company} className="w-full h-full object-contain" />
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-gray-900 truncate">{job.title}</h3>
+                          <div className="flex flex-wrap gap-y-1 gap-x-3 mt-1">
+                            <div className="flex items-center text-sm text-gray-500">
+                              <Building className="w-3 h-3 mr-1" />
+                              {job.company}
+                            </div>
+                            <div className="flex items-center text-sm text-gray-500">
+                              <MapPin className="w-3 h-3 mr-1" />
+                              {job.location}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex-shrink-0 flex items-center">
+                          <span className="text-xs font-medium px-2 py-1 bg-green-100 text-green-800 rounded-full">{job.type}</span>
+                          <span className="text-xs text-gray-500 ml-3">{job.posted}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Briefcase className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                    <p className="text-gray-500">No job postings available</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Recommended Mentors and Notifications */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Mentors */}
+            <div className="lg:col-span-2 bg-white rounded-lg shadow">
+              <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h2 className="text-lg font-semibold">Recommended Mentors</h2>
+                <button 
+                  onClick={() => navigate('/dashboard/mentorship')}
+                  className="text-purple-600 hover:text-purple-800 text-sm flex items-center"
+                >
+                  View all mentors
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                </button>
+              </div>
+              <div className="p-4">
+                {mentors.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {mentors.slice(0, 3).map(mentor => (
+                      <div key={mentor._id} className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                        <div className="relative">
+                          <img
+                            src={`http://localhost:5000/${mentor.image}`}
+                            alt={mentor.name}
+                            className="w-full h-32 object-cover"
+                          />
+                        </div>
+                        <div className="p-4">
+                          <h3 className="font-semibold">{mentor.name}</h3>
+                          <p className="text-sm text-gray-600">{mentor.role} at {mentor.company}</p>
+                          <div className="flex items-center mt-2 text-sm">
+                            <Star className="w-4 h-4 text-yellow-400 mr-1" />
+                            <span>{mentor.rating}</span>
+                            <span className="mx-2">•</span>
+                            <span>{mentor.sessions} sessions</span>
+                          </div>
+                          <div className="mt-3">
+                            <button className="w-full bg-purple-600 text-white text-sm px-3 py-1.5 rounded-md hover:bg-purple-700 transition-colors">
+                              Connect
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Users className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                    <p className="text-gray-500">No mentors available</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Notifications */}
+            <div className="bg-white rounded-lg shadow">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-lg font-semibold">Notifications</h2>
+              </div>
+              <div className="p-4">
+                {notifications.length > 0 ? (
+                  <div className="space-y-4">
+                    {/* Sample notifications - in a real app, use actual notification data */}
+                    <div className="flex items-start p-2 hover:bg-gray-50 rounded-lg transition-colors">
+                      <div className="bg-blue-100 p-2 rounded-full mr-3">
+                        <Bell className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm">Your course <span className="font-medium">React Fundamentals</span> is 70% complete</p>
+                        <p className="text-xs text-gray-500 mt-1">2 hours ago</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start p-2 hover:bg-gray-50 rounded-lg transition-colors">
+                      <div className="bg-purple-100 p-2 rounded-full mr-3">
+                        <Calendar className="w-5 h-5 text-purple-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm">Reminder: <span className="font-medium">AI Workshop</span> starting in 3 hours</p>
+                        <p className="text-xs text-gray-500 mt-1">5 hours ago</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start p-2 hover:bg-gray-50 rounded-lg transition-colors">
+                      <div className="bg-green-100 p-2 rounded-full mr-3">
+                        <Users className="w-5 h-5 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm">Mentor <span className="font-medium">Sarah Johnson</span> accepted your request</p>
+                        <p className="text-xs text-gray-500 mt-1">Yesterday</p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Bell className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                    <p className="text-gray-500">No notifications</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Main Content Area - With proper margin to avoid navbar overlay */}
-      <div className="flex-1 ml-64">
-        {/* Header */}
-        <header className="bg-white shadow-sm sticky top-0 z-20">
-          <div className="flex items-center justify-between px-6 py-4">
-            <h2 className="text-xl font-semibold text-gray-800">Welcome back, {userName}</h2>
-            <div className="flex items-center space-x-4">
-              <button className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200">
-                <Bell className="h-5 w-5" />
-              </button>
-              <button
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
-                onClick={() => navigate('/profile')}
-              >
-                <User className="h-5 w-5" />
-              </button>
-              <button
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
-                onClick={() => navigate('/login')}
-              >
-                <LogOut className="h-5 w-5" />
+      {/* Fixed Floating Dashboard & Chatbot Icons */}
+      <div className="fixed bottom-6 right-6 flex flex-col gap-4">
+        {/* Dashboard Icon */}
+        <button 
+          onClick={() => navigate('/dashboard/ai-assistant')} 
+          className="bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-full shadow-lg transition-colors"
+          title="Dashboard"
+        >
+          <LayoutDashboard className="w-6 h-6" />
+        </button>
+        
+        {/* Chatbot Icon */}
+        <button 
+          onClick={toggleChatbot} 
+          className="bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg transition-colors"
+          title="Chat with Assistant"
+        >
+          <MessageSquare className="w-6 h-6" />
+        </button>
+      </div>
+
+      {/* Chatbot Dialog */}
+      {chatbotOpen && (
+        <div className="fixed bottom-24 right-6 w-80 h-96 bg-white rounded-lg shadow-2xl flex flex-col overflow-hidden border border-gray-200">
+          <div className="bg-indigo-600 text-white px-4 py-3 flex justify-between items-center">
+            <h3 className="font-medium">Learning Assistant</h3>
+            <button onClick={toggleChatbot} className="text-white hover:text-gray-200">
+              ✕
+            </button>
+          </div>
+          <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
+            {/* Chat messages would go here */}
+            <div className="bg-indigo-100 rounded-lg p-3 mb-3 max-w-[80%]">
+              <p className="text-sm">Hi there! How can I help with your learning journey today?</p>
+            </div>
+          </div>
+          <div className="border-t border-gray-200 p-3">
+            <div className="flex gap-2">
+              <input 
+                type="text" 
+                placeholder="Type your message..." 
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              />
+              <button className="bg-indigo-600 text-white px-3 py-2 rounded-md hover:bg-indigo-700">
+                Send
               </button>
             </div>
           </div>
-        </header>
-
-        {/* Main Content with scrollable area */}
-        <main className="p-6 overflow-auto h-[calc(100vh-64px)]">
-          <Routes>
-            <Route path="/" element={<DashboardContent />} />
-            <Route path="/e-learning" element={<ELearningPage />} />
-            <Route path="/mentorship" element={<MentorPage />} />
-            <Route path="/jobs" element={<JobsPage />} />
-            <Route path="/messages" element={<MessagesPage />} />
-            <Route path="/events" element={<EventsPage />} />
-            <Route path="/open-projects" element={<OpenProjectsPage />} />
-            <Route path="/ai-assistant" element={<AIAssistantPage />} />
-            <Route path="/workshops" element={<WorkshopsPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/studentprofile" element={<StudentProfilePage />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
-      </div>
+        </div>
+      )}
     </div>
   );
 };

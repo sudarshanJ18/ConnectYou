@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
 
 // Add a new event
 router.post('/', async (req, res) => {
-  const { title, date, time, location, description } = req.body;
+  const { title, date, time, location, description, meetingLink } = req.body;
 
   const event = new Event({
     title,
@@ -22,6 +22,7 @@ router.post('/', async (req, res) => {
     time,
     location,
     description,
+    meetingLink
   });
 
   try {
@@ -40,12 +41,13 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ message: 'Event not found' });
     }
 
-    const { title, date, time, location, description } = req.body;
+    const { title, date, time, location, description, meetingLink } = req.body;
     event.title = title || event.title;
     event.date = date || event.date;
     event.time = time || event.time;
     event.location = location || event.location;
     event.description = description || event.description;
+    event.meetingLink = meetingLink !== undefined ? meetingLink : event.meetingLink;
 
     const updatedEvent = await event.save();
     res.json(updatedEvent);
